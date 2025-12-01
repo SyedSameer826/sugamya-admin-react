@@ -1,0 +1,12 @@
+{
+  "welcome": "مرحبًا في تطبيقي!",
+  "dashboard": {
+    "heading": "لوحة التحكم"
+  },
+  "category": {
+    "heading": "إدارة الفئات"
+  },
+  "subadmin": {
+    "heading": "إدارة المشرفين الفرعيين"
+  }
+}

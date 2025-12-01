@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome to my app!",
+  "dashboard": "Dashboard",
+  "category": "Category",
+  "subadmin": "Sub-Admin",
+  "management": "Management",
+  "update": "Update",
+  "create": "Create",
+  "edit": "Edit"
+}

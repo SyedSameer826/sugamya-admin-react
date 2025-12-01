@@ -1,0 +1,49 @@
+.ant-table-content table th{
+    text-transform: uppercase;
+}
+.selected-flag{
+    border-radius: 50px 0 0 50px !important;
+}
+.react-tel-input .flag-dropdown{
+    border-radius: 50px 0 0 50px !important;
+}
+.flag-dropdown:hover{
+    border: 1px solid #cacaca;
+}
+.react-tel-input .selected-flag:hover, .react-tel-input .selected-flag:focus{
+    background:unset !important;
+   
+}
+.react-tel-input .selected-flag{
+    width: 45px !important;
+}
+.ant-modal-content .react-tel-input .form-control:focus{
+    border-color: #40a9ff !important;
+    box-shadow: 0 0 0 2px rgba(24,144,255,.2) !important;
+    border-right-width: 1px !important;
+    outline: 0;
+}
+.ant-image{
+    margin-right: 10px;
+} 
+.ant-image img{
+    transition: 0.3s;
+}
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover .ant-image img{
+    filter: grayscale(0%) !important;
+}
+.ant-menu-title-content .ant-image-mask{
+    display: none !important;
+}
+
+.ant-menu-title-content img{
+filter: brightness(100) !important;
+}
+/* .ant-menu-title-content .ant-image {
+    min-width: 50px !important;
+    
+} */
+/* .ant-menu-title-content a {
+    min-width: 50px !important;
+    
+} */
