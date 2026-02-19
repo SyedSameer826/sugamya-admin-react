@@ -38,6 +38,9 @@ import {
 } from "../../../helper/functions";
 import { UndoOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { Tabs } from "antd";
+import DoctorAppointments from "./DoctorAppointments";
+const { TabPane } = Tabs;
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -96,6 +99,16 @@ function Index() {
 
   const debouncedSearchText = useDebounce(searchText, 300);
   const navigate = useNavigate();
+  const queryParams = new URLSearchParams(window.location.search);
+  const tabKey = queryParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(tabKey ? tabKey : "1");
+
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+
+    navigate(`/doctor?tab=${key}`);
+  };
 
   const view = (id) => {
     navigate(`/doctor/view/${id}`);
@@ -588,7 +601,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     if (queryString) {
@@ -602,16 +615,16 @@ function Index() {
       `/doctor${
         queryString
           ? `?${queryString}&search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
           : `?search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
-      }`
+      }`,
     );
     request({
       url:
@@ -678,7 +691,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     if (queryString) {
@@ -765,7 +778,7 @@ function Index() {
         filter?.end_date
           ? `-${moment(filter?.end_date).format("DD-MM-YYYY")}`
           : ""
-      }${debouncedSearchText ? `_${debouncedSearchText}` : ""}.xlsx`
+      }${debouncedSearchText ? `_${debouncedSearchText}` : ""}.xlsx`,
     );
   };
 
@@ -784,159 +797,190 @@ function Index() {
   };
   return (
     <>
-      <SectionWrapper
-        cardHeading={lang("Doctors") + " " + lang("list")}
-        extra={
-          <>
-            <div className="w-100 d-grid align-items-baseline text-head_right_cont">
-              <div className="pageHeadingSearch pageHeadingbig d-flex gap-2">
-                <div className="role-wrap">
-                  <DatePicker.RangePicker
-                    format="DD-MM-YY" 
-                    disabledDate={(current) => current && current > moment().endOf("day")}
-                    placeholder={[lang("Start Date"), lang("End Date")]}
-                    value={[
-                      filter.start_date ? moment(filter.start_date, "YYYY-MM-DD") : null,
-                      filter.end_date ? moment(filter.end_date, "YYYY-MM-DD") : null,
-                    ]}
-                  
-                    onChange={(value) => {
-                      if (value && value[0] && value[1]) {
-                        setFilter((prev) => ({
-                          ...prev,
-                          start_date: moment(value[0]).format("YYYY-MM-DD"),
-                          end_date: moment(value[1]).format("YYYY-MM-DD"),
-                        }));
-                      } else {
-                        setFilter((prev) => ({
-                          ...prev,
-                          start_date: undefined,
-                          end_date: undefined,
-                        }));
-                      }
+      <div className="tabled doctor">
+        <Tabs
+          className="blog-panel-tab"
+          activeKey={activeTab}
+          onChange={handleTabChange}
+        >
+          {/* TAB 1 → DOCTORS LIST */}
+          <TabPane tab="Doctors List" key="1">
+            <>
+              <SectionWrapper
+                cardHeading={lang("Doctors") + " " + lang("list")}
+                extra={
+                  <>
+                    <div className="w-100 d-grid align-items-baseline text-head_right_cont">
+                      <div className="pageHeadingSearch pageHeadingbig d-flex gap-2">
+                        <div className="role-wrap">
+                          <DatePicker.RangePicker
+                            format="DD-MM-YY"
+                            disabledDate={(current) =>
+                              current && current > moment().endOf("day")
+                            }
+                            placeholder={[lang("Start Date"), lang("End Date")]}
+                            value={[
+                              filter.start_date
+                                ? moment(filter.start_date, "YYYY-MM-DD")
+                                : null,
+                              filter.end_date
+                                ? moment(filter.end_date, "YYYY-MM-DD")
+                                : null,
+                            ]}
+                            onChange={(value) => {
+                              if (value && value[0] && value[1]) {
+                                setFilter((prev) => ({
+                                  ...prev,
+                                  start_date: moment(value[0]).format(
+                                    "YYYY-MM-DD",
+                                  ),
+                                  end_date: moment(value[1]).format(
+                                    "YYYY-MM-DD",
+                                  ),
+                                }));
+                              } else {
+                                setFilter((prev) => ({
+                                  ...prev,
+                                  start_date: undefined,
+                                  end_date: undefined,
+                                }));
+                              }
+                            }}
+                          />
+                        </div>
+                        <Input.Search
+                          className="searchInput"
+                          placeholder="Search by Doctor Name, Phone Number and Email"
+                          onChange={onSearch}
+                          allowClear
+                          value={searchText}
+                        />
+                        <Button
+                          onClick={() => handleReset()}
+                          type="primary"
+                          icon={<UndoOutlined />}
+                        >
+                          Reset
+                        </Button>
+                        <Button
+                          className="primary_btn btnStyle"
+                          onClick={(e) => {
+                            setVisible(true);
+                            setSearchText("");
+                          }}
+                        >
+                          <span className="add-Ic">
+                            <img src={Plus} />
+                          </span>
+                          Add {sectionName}
+                        </Button>
+                        <Button
+                          className="btnStyle  primary_btn"
+                          loading={exportLoading}
+                          onClick={() => getExportData()}
+                        >
+                          Export
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                }
+              >
+                <div className="table-responsive customPagination">
+                  <h4 className="text-right">
+                    Total Records: {pagination.total}
+                  </h4>
+                  <Table
+                    loading={loading}
+                    columns={columns}
+                    dataSource={list}
+                    pagination={{
+                      current: pagination?.current,
+                      defaultPageSize: +pageSize
+                        ? +pageSize
+                        : (+pagination.pageSize ?? 10),
+                      responsive: true,
+                      total: pagination?.total,
+                      showSizeChanger: true,
+                      showQuickJumper: true,
+                      pageSizeOptions: ["10", "20", "30", "50"],
+                    }}
+                    onChange={handleChange}
+                    className="ant-border-space"
+                    rowClassName={(record) => {
+                      return record.is_delete ? "deleted-row" : "";
                     }}
                   />
                 </div>
-                <Input.Search
-                  className="searchInput"
-                  placeholder="Search by Doctor Name, Phone Number and Email"
-                  onChange={onSearch}
-                  allowClear
-                  value={searchText}
-                />
-                <Button
-                  onClick={() => handleReset()}
-                  type="primary"
-                  icon={<UndoOutlined />}
-                >
-                  Reset
-                </Button>
-                <Button
-                  className="primary_btn btnStyle"
-                  onClick={(e) => {
-                    setVisible(true);
-                    setSearchText("");
+              </SectionWrapper>
+
+              {visible && (
+                <AddFrom
+                  section={sectionName}
+                  api={api}
+                  show={visible}
+                  hide={() => {
+                    setSelected();
+                    setVisible(false);
                   }}
-                >
-                  <span className="add-Ic">
-                    <img src={Plus} />
-                  </span>
-                  Add {sectionName}
-                </Button>
-                <Button
-                  className="btnStyle  primary_btn"
-                  loading={exportLoading}
-                  onClick={() => getExportData()}
-                >
-                  Export
-                </Button>
-              </div>
-            </div>
-          </>
-        }
-      >
-        <div className="table-responsive customPagination">
-          <h4 className="text-right">Total Records: {pagination.total}</h4>
-          <Table
-            loading={loading}
-            columns={columns}
-            dataSource={list}
-            pagination={{
-              current: pagination?.current,
-              defaultPageSize: +pageSize
-                ? +pageSize
-                : +pagination.pageSize ?? 10,
-              responsive: true,
-              total: pagination?.total,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              pageSizeOptions: ["10", "20", "30", "50"],
-            }}
-            onChange={handleChange}
-            className="ant-border-space"
-            rowClassName={(record) => {
-              return record.is_delete ? "deleted-row" : "";
-            }}
-          />
-        </div>
-      </SectionWrapper>
+                  data={selected}
+                  refresh={() => setRefresh((prev) => !prev)}
+                />
+              )}
+              {availability && (
+                <ViewAvailability
+                  section={sectionName}
+                  api={api}
+                  show={availability}
+                  hide={() => {
+                    setSelected();
+                    setAvailability(false);
+                    setSelectedDr();
+                  }}
+                  data={selected}
+                  selectedDr={selectedDr}
+                  refresh={() => setRefresh((prev) => !prev)}
+                />
+              )}
 
-      {visible && (
-        <AddFrom
-          section={sectionName}
-          api={api}
-          show={visible}
-          hide={() => {
-            setSelected();
-            setVisible(false);
-          }}
-          data={selected}
-          refresh={() => setRefresh((prev) => !prev)}
-        />
-      )}
-      {availability && (
-        <ViewAvailability
-          section={sectionName}
-          api={api}
-          show={availability}
-          hide={() => {
-            setSelected();
-            setAvailability(false);
-            setSelectedDr();
-          }}
-          data={selected}
-          selectedDr={selectedDr}
-          refresh={() => setRefresh((prev) => !prev)}
-        />
-      )}
+              {showDelete && (
+                <DeleteModal
+                  title={"Delete User"}
+                  subtitle={`Are you sure you want to Delete this user?`}
+                  show={showDelete}
+                  hide={() => {
+                    setShowDelete(false);
+                    setSelected();
+                  }}
+                  onOk={() => onDelete(selected?._id)}
+                />
+              )}
 
-      {showDelete && (
-        <DeleteModal
-          title={"Delete User"}
-          subtitle={`Are you sure you want to Delete this user?`}
-          show={showDelete}
-          hide={() => {
-            setShowDelete(false);
-            setSelected();
-          }}
-          onOk={() => onDelete(selected?._id)}
-        />
-      )}
+              {showStatus && (
+                <DeleteModal
+                  title={`${selected?.is_active ? `Block` : `UnBlock`} User`}
+                  subtitle={`Are you sure you want to ${
+                    selected?.is_active ? `block` : `unblock`
+                  } this user?`}
+                  show={showStatus}
+                  hide={() => {
+                    setShowStatus(false);
+                    setSelected();
+                  }}
+                  onOk={() => handleChangeStatus(selected?._id)}
+                />
+              )}
+            </>
+          </TabPane>
 
-      {showStatus && (
-        <DeleteModal
-          title={`${selected?.is_active ? `Block` : `UnBlock`} User`}
-          subtitle={`Are you sure you want to ${
-            selected?.is_active ? `block` : `unblock`
-          } this user?`}
-          show={showStatus}
-          hide={() => {
-            setShowStatus(false);
-            setSelected();
-          }}
-          onOk={() => handleChangeStatus(selected?._id)}
-        />
-      )}
+          {/* TAB 2 → DOCTOR APPOINTMENTS */}
+          <TabPane tab="Doctor Appointments" key="2">
+            <DoctorAppointments />
+          </TabPane>
+        </Tabs>
+      </div>
+
+      {/* KEEP YOUR MODALS BELOW (AddForm, DeleteModal, etc.) */}
     </>
   );
 }

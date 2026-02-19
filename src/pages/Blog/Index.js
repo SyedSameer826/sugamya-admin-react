@@ -53,8 +53,8 @@ function Index(props) {
   const [refresh, setRefresh] = useState(false);
   const [selected, setSelected] = useState();
   const [showDeleteeBlog, setShowDeleteeBlog] = useState(false);
-//For Filters
-const [filter, setFilter] = useState();
+  //For Filters
+  const [filter, setFilter] = useState();
 
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
   const debouncedSearchText = useDebounce(searchText, 300);
@@ -63,7 +63,7 @@ const [filter, setFilter] = useState();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const type = queryParams.get("key");
-  console.log(type,"state")
+  console.log(type, "state");
 
   const view = (id) => {
     navigate(`/${routeName}/view/${id}`);
@@ -77,10 +77,10 @@ const [filter, setFilter] = useState();
       title: "S.No.",
       dataIndex: "sno",
       key: "sno",
-      render: (_, __, index) =>  pagination.current === 1
-      ? index + 1
-      : (pagination.current - 1) * 10 + (index + 1),
-
+      render: (_, __, index) =>
+        pagination.current === 1
+          ? index + 1
+          : (pagination.current - 1) * 10 + (index + 1),
     },
     {
       title: "Thumbnail",
@@ -151,9 +151,11 @@ const [filter, setFilter] = useState();
               <Button
                 className="ant-btn ant-btn-default"
                 title="Edit"
-                onClick={() => navigate(`/${routeName}/edit/` + (record ? record._id : null))}
+                onClick={() =>
+                  navigate(`/${routeName}/edit/` + (record ? record._id : null))
+                }
               >
-                    <i class="fas fa-edit"></i>
+                <i class="fas fa-edit"></i>
               </Button>
             </Tooltip>
             {/* <Tooltip
@@ -239,7 +241,7 @@ const [filter, setFilter] = useState();
   };
 
   const handleChange = (pagination, filters) => {
-    setFilter(filters)
+    setFilter(filters);
     fetchData(pagination, filters);
   };
 
@@ -247,104 +249,104 @@ const [filter, setFilter] = useState();
     setSearchText(e.target.value);
     setPagination({ current: 1, pageSize: 10 });
   };
-  const [activeTab, setActiveTab] = useState(type?type :"1");
+  const [activeTab, setActiveTab] = useState(type ? type : "1");
   const handleTabChange = (key) => {
     setActiveTab(key);
     // Add any other state updates or logic you need here
-};
+  };
 
-const onDeleted = (id) => {
-  request({
-    url: apiPath.deleteBlog + "/" + id,
-    method: "DELETE",
-    onSuccess: (data) => {
-      setLoading(false);
-      ShowToast(data.message, Severty.SUCCESS);
-      setRefresh((prev) => !prev);
-    },
-    onError: (error) => {
-      setLoading(false);
-      ShowToast(error, Severty.ERROR);
-    },
-  });
-};
- 
+  const onDeleted = (id) => {
+    request({
+      url: apiPath.deleteBlog + "/" + id,
+      method: "DELETE",
+      onSuccess: (data) => {
+        setLoading(false);
+        ShowToast(data.message, Severty.SUCCESS);
+        setRefresh((prev) => !prev);
+      },
+      onError: (error) => {
+        setLoading(false);
+        ShowToast(error, Severty.ERROR);
+      },
+    });
+  };
 
   return (
     <>
       <div className="tabled blog">
-
         <Row gutter={[24, 0]}>
-         
           <Col xs={24} xl={24}>
-          <Tabs  className="blog-panel-tab" activeKey={activeTab} onChange={handleTabChange}>
-            <TabPane className="blogs-tab" tab="Blogs" key="1">
-            <Card
-              bordered={false}
-              className="criclebox tablespace mb-24"
-              title={sectionName + "Listing"}
-              extra={
-                <>
-              
-                  <div className="button_group justify-content-end w-100">
-                  <div className="pageHeadingSearch">
-                <Input.Search
-                  className="searchInput"
-                    allowClear
-                    size="large"
-                    onChange={onSearch}
-                    value={searchText}
-                    onPressEnter={onSearch}
-                    placeholder="Search By Title"
-                  />
-                  </div>
-                    <Button
-                      className="primary_btn btnStyle"
-                      onClick={() => navigate(`/${routeName}/add`)}
-                    >
-                       <span className="add-Ic">
-                        <img src={Plus} />
-                      </span>
-                      Add {sectionName}
-                    </Button>
-                  </div>
-                </>
-              }
+            <Tabs
+              className="blog-panel-tab"
+              activeKey={activeTab}
+              onChange={handleTabChange}
             >
-             
-            
-              <div className="table-responsive customPagination">
-              <h4 className="text-right">Total Records: {pagination.total ? pagination.total : list.length}</h4>
+              <TabPane className="blogs-tab" tab="Blogs" key="1">
+                <Card
+                  bordered={false}
+                  className="criclebox tablespace mb-24"
+                  title={sectionName + " Listing"}
+                  extra={
+                    <>
+                      <div className="button_group justify-content-end w-100">
+                        <div className="pageHeadingSearch">
+                          <Input.Search
+                            className="searchInput"
+                            allowClear
+                            size="large"
+                            onChange={onSearch}
+                            value={searchText}
+                            onPressEnter={onSearch}
+                            placeholder="Search By Title"
+                          />
+                        </div>
+                        <Button
+                          className="primary_btn btnStyle"
+                          onClick={() => navigate(`/${routeName}/add`)}
+                        >
+                          <span className="add-Ic">
+                            <img src={Plus} />
+                          </span>
+                          Add {sectionName}
+                        </Button>
+                      </div>
+                    </>
+                  }
+                >
+                  <div className="table-responsive customPagination">
+                    <h4 className="text-right">
+                      Total Records:{" "}
+                      {pagination.total ? pagination.total : list.length}
+                    </h4>
 
-                <Table
-                  loading={loading}
-                  columns={columns}
-                  dataSource={list}
-                  pagination={{
-                    defaultPageSize: 10,
-                    responsive: true,
-                    total: pagination.total,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    pageSizeOptions: ["10", "20", "30", "50"],
-                  }}
-                  onChange={handleChange}
-                  className="ant-border-space"
-                />
-              </div>
-            </Card>
-            </TabPane>
-            <TabPane className="blogs-tab" tab="Banners" key="2">
-               <Banner />
-            </TabPane>
-            <TabPane className="blogs-tab" tab="Interactive Video" key="3">
-               <Videos/>
-            </TabPane>
-            <TabPane className="blogs-tab" tab="Content" key="4">
-               <Contents />
-            </TabPane>
-          </Tabs>
-          
+                    <Table
+                      loading={loading}
+                      columns={columns}
+                      dataSource={list}
+                      pagination={{
+                        defaultPageSize: 10,
+                        responsive: true,
+                        total: pagination.total,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                        pageSizeOptions: ["10", "20", "30", "50"],
+                      }}
+                      onChange={handleChange}
+                      className="ant-border-space"
+                    />
+                  </div>
+                </Card>
+              </TabPane>
+              <TabPane className="blogs-tab" tab="Banners" key="2">
+                <Banner />
+              </TabPane>
+              <TabPane className="blogs-tab" tab="Interactive Video" key="3">
+                <Videos />
+              </TabPane>
+              <TabPane className="blogs-tab" tab="Content" key="4">
+                <Contents />
+              </TabPane>
+            </Tabs>
           </Col>
         </Row>
       </div>

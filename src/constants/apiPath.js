@@ -1,8 +1,7 @@
 import { update } from "lodash";
 
 let appMode = process.env.REACT_APP_ENV;
-let ASSET_URL =
-  "https://s3-noi.aces3.ai/sugamaya-bucket/";
+let ASSET_URL = "https://s3-noi.aces3.ai/sugamaya-bucket/";
 let URL;
 
 console.log("appMode", appMode);
@@ -15,14 +14,14 @@ if (appMode === "development") {
   // URL = "https://036a261977c6.ngrok-free.app/api/";
   // URL = "https://backend.sugamya-ayurveda.com/api/";
   URL = "http://43.205.167.204/api/";
-
 } else {
   // URL = "http://217.15.175.151:9060/api/";
   // URL = "https://036a261977c6.ngrok-free.app/api/";
   // URL = "http://localhost:9061/api/";
   // URL = "https://backend.sugamya-ayurveda.com/api/";
-  URL = "http://43.205.167.204/api/";
-
+  // URL = "http://43.205.167.204/api/";
+  URL = "https://goldenpark.vayuz.com/api/";
+  // URL = "http://localhost:5000/api/";
 }
 
 let apiPath = {
@@ -70,7 +69,7 @@ let apiPath = {
   sendOTP: "admin/auth/send-otp",
   changeMail: "admin/auth/change-mail",
   resetPassword: "admin/auth/reset-password",
-
+  doctorsAppointments: "admin/doctor/availability/doctors",
   // SubAdmin APIs
   subAdmin: "admin/sub-admin",
   viewSubAdmin: "admin/sub-admin/",
@@ -96,7 +95,7 @@ let apiPath = {
 
   //Address
   address: "admin/user/addAddress",
-   editAddress: "admin/user/editAddress",
+  editAddress: "admin/user/editAddress",
   deleteAddress: "admin/user/deleteAddress",
 
   //collector

@@ -49,8 +49,8 @@ function Index() {
   const debouncedSearchText = useDebounce(searchText, 300);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
- //For Filters
- const [filter, setFilter] = useState();
+  //For Filters
+  const [filter, setFilter] = useState();
 
   const onDelete = (id) => {
     request({
@@ -77,7 +77,7 @@ function Index() {
     setSelectedRecord(null);
   };
 
-  const handleStatusSubmit = (status, reason,record) => {
+  const handleStatusSubmit = (status, reason, record) => {
     console.log("Status:", status);
     console.log("Reason:", reason);
     // Implement your submit logic here, such as an API call to update the status
@@ -182,8 +182,8 @@ function Index() {
           record?.leaveStatus === "Approved"
             ? "green"
             : record?.leaveStatus === "Rejected"
-            ? "red"
-            : "orange";
+              ? "red"
+              : "orange";
         return (
           <Tag
             color={color}
@@ -207,7 +207,7 @@ function Index() {
 
   useEffect(() => {
     setLoading(true);
-    fetchData({ ...pagination, current: 1 },filter);
+    fetchData({ ...pagination, current: 1 }, filter);
   }, [
     refresh,
     debouncedSearchText,
@@ -230,11 +230,11 @@ function Index() {
     request({
       url: `${api.doctor}?type=${filterType ? filterType : ""}&status=${
         filterActive ? filterActive : ""
-      }&page=${pagination ? pagination.current : 1
-        }&pageSize=${pagination ? pagination.pageSize : 10
-        }&start_date=${startDate ? startDate : ""}&end_date=${endDate ? endDate : ""} `,
+      }&page=${pagination ? pagination.current : 1}&pageSize=${
+        pagination ? pagination.pageSize : 10
+      }&start_date=${startDate ? startDate : ""}&end_date=${endDate ? endDate : ""} `,
       method: "GET",
-      onSuccess: ({data}) => {
+      onSuccess: ({ data }) => {
         setLoading(false);
         setList(data.list.docs);
 
@@ -253,7 +253,7 @@ function Index() {
   };
 
   const handleChange = (pagination, filters) => {
-    setFilter(filters)
+    setFilter(filters);
     fetchData(pagination, filters);
   };
 
@@ -296,25 +296,24 @@ function Index() {
             loading={loading}
             columns={columns}
             dataSource={list}
-            pagination={{ 
+            pagination={{
               ...pagination,
               defaultPageSize: 10,
-               responsive: true, 
-              //  total: pagination.total, 
-               showSizeChanger: true, 
-               pageSizeOptions: ['10', '20', '30', '50'] 
-              }}
+              responsive: true,
+              //  total: pagination.total,
+              showSizeChanger: true,
+              pageSizeOptions: ["10", "20", "30", "50"],
+            }}
             onChange={handleChange}
             className="ant-border-space"
           />
           {selectedRecord && (
             <StatusModal
-            refresh={()=>setRefresh(prev => !prev)}
+              refresh={() => setRefresh((prev) => !prev)}
               visible={isModalVisible}
               onClose={handleModalClose}
               onSubmit={handleStatusSubmit}
               leaveId={selectedRecord._id}
-
             />
           )}
         </div>
