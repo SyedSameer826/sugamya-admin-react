@@ -24,7 +24,7 @@ import SectionWrapper from "../../components/SectionWrapper";
 import { AppStateContext } from "../../context/AppContext";
 import lang from "../../helper/langHelper";
 import DeleteModal from "../../components/DeleteModal";
-
+import ReviewForm from "./EditForm";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { set } from "lodash";
@@ -38,12 +38,13 @@ function Index() {
 
   const sectionName = "Review & Rating";
   const routeName = "reviews";
-
+  const [visible, setVisible] = useState(false);
   const api = {
     list: apiPath.listReviews,
     userReviews: apiPath.userReviews,
     testimonial: apiPath.testimonial,
     status: apiPath.statusReview,
+    addEdit: apiPath.addEditReview,
   };
 
   const [searchText, setSearchText] = useState("");
@@ -183,6 +184,20 @@ function Index() {
       render: (_, record) => {
         return (
           <>
+            {activeTab === "3" && (
+              <Tooltip title={"Edit"} color={"purple"} key={"edit"}>
+                <Button
+                  className="edit-cls btnStyle primary_btn"
+                  onClick={() => {
+                    setSelected(record);
+                    setVisible(true);
+                  }}
+                >
+                  <i class="fas fa-edit"></i>
+                  {/* <span>Edit</span> */}
+                </Button>
+              </Tooltip>
+            )}
             <Tooltip
               title={"Delete"}
               color={"purple"}
@@ -238,7 +253,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
 
@@ -275,7 +290,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     request({
@@ -311,7 +326,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     request({
@@ -505,6 +520,19 @@ function Index() {
           </TabPane>
         </Tabs>
       </SectionWrapper>
+      {visible && (
+        <ReviewForm
+          section={sectionName}
+          api={api}
+          show={visible}
+          hide={() => {
+            setSelected();
+            setVisible(false);
+          }}
+          data={selected}
+          refresh={() => setRefresh((prev) => !prev)}
+        />
+      )}
       {showDelete && (
         <DeleteModal
           title={"Delete Review"}

@@ -56,13 +56,13 @@ function Index() {
   const paramsDoctorSearchText = urlParams.get("doctorSearchText");
   const end_date = urlParams.get("end_date");
   const [appointmentSearchText, setAppointmentSearchText] = useState(
-    urlParams.get("debouncedSearchText") ?? ""
+    urlParams.get("debouncedSearchText") ?? "",
   );
   const [patientSearchText, setPatientSearchText] = useState(
-    paramspatientSearchText ?? ""
+    paramspatientSearchText ?? "",
   );
   const [doctorSearchText, setDoctorSearchText] = useState(
-    paramsDoctorSearchText ?? ""
+    paramsDoctorSearchText ?? "",
   );
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -83,7 +83,7 @@ function Index() {
 
   const navigate = useNavigate();
   const handleChangeStatus = (id, value, type) => {
-    setLoading(true)
+    setLoading(true);
     const payload = { value: value };
     request({
       url: api.appointment + "/status/" + id + `?type=${type}`,
@@ -115,19 +115,19 @@ function Index() {
 
     // Parse the date and time separately and combine them
     const formattedDate = moment(appointment_date, "DD-MM-YYYY").format(
-      "DD-MM-YYYY"
+      "DD-MM-YYYY",
     );
     const formattedTime = moment(appointment_time, "hh:mm A").format("HH:mm");
 
     const appointmentDateTime = moment(
       `${formattedDate}T${formattedTime}`,
-      "DD-MM-YYYYTHH:mm"
+      "DD-MM-YYYYTHH:mm",
     );
     const currentTime = moment();
 
     // Clone appointmentDateTime before adding to avoid side effects
     const isDisabled = currentTime.isAfter(
-      appointmentDateTime.clone().add(24, "hours")
+      appointmentDateTime.clone().add(24, "hours"),
     );
 
     // console.log(isDisabled, "--isDisabled", currentTime, "currentTime", appointmentDateTime, "appointmentDateTime");
@@ -200,8 +200,8 @@ function Index() {
                       booked_for == "self"
                         ? "green"
                         : booked_for == "relation"
-                        ? "blue"
-                        : "teal"
+                          ? "blue"
+                          : "teal"
                     }
                     key={booked_for}
                     className="cap"
@@ -363,18 +363,12 @@ function Index() {
         );
       },
     },
-    // {
-    //   title: "Next Follow-up",
-    //   dataIndex: "Next Follow-up",
-    //   key: "Next Follow-up",
-    //   render: (_, { _id, doctor }) => {
-    //     return (
-    //       <>
-    //         Next Follow-up
-    //       </>
-    //     );
-    //   },
-    // },
+    {
+      title: "Next Follow-up",
+      dataIndex: "Next Follow-up",
+      key: "nextFollowUpDate",
+      render: (_, { nextFollowUpDate }) => nextFollowUpDate,
+    },
 
     {
       title: "Appt Type",
@@ -391,7 +385,7 @@ function Index() {
       ],
       render: (
         _,
-        { appointment_type, _id, appointment_time, appointment_date }
+        { appointment_type, _id, appointment_time, appointment_date },
       ) => {
         console.log("Status :: ", appointment_type);
         const timeInLocal = moment.utc(appointment_time, "HH:mm").local();
@@ -445,7 +439,7 @@ function Index() {
       ],
       render: (
         _,
-        { appointment_category, _id, appointment_time, appointment_date }
+        { appointment_category, _id, appointment_time, appointment_date },
       ) => {
         console.log("Status :: ", appointment_category);
         const timeInLocal = moment.utc(appointment_time, "HH:mm").local();
@@ -492,7 +486,7 @@ function Index() {
       ],
       render: (
         _,
-        { appointment_status, _id, appointment_time, appointment_date }
+        { appointment_status, _id, appointment_time, appointment_date },
       ) => {
         console.log("Status :: ", appointment_status);
         const timeInLocal = moment.utc(appointment_time, "HH:mm").local();
@@ -584,7 +578,7 @@ function Index() {
       ],
       render: (
         _,
-        { status, _id, appointment_time, appointment_date, appointment_status }
+        { status, _id, appointment_time, appointment_date, appointment_status },
       ) => {
         console.log("Status :: ", status);
 
@@ -756,14 +750,14 @@ function Index() {
 
     navigate(
       `/appointment${`?patientSearchText=${encodeURIComponent(
-        debouncedPatientSearchText
+        debouncedPatientSearchText,
       )}&doctorSearchText=${encodeURIComponent(
-        debouncedDoctorSearchText
+        debouncedDoctorSearchText,
       )}&debouncedSearchText=${encodeURIComponent(
-        debouncedSearchText
+        debouncedSearchText,
       )}&page=${encodeURIComponent(
-        pagination.current ?? 1
-      )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`}`
+        pagination.current ?? 1,
+      )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`}`,
     );
     request({
       url:
@@ -896,8 +890,8 @@ function Index() {
         row?.booked_for === "relation"
           ? row?.patient_details?.relationship_with_user
           : row?.booked_for
-          ? row?.booked_for
-          : "-",
+            ? row?.booked_for
+            : "-",
 
       "Scheduled Date": row?.appointment_date
         ? moment.parseZone(row?.appointment_date).format("DD-MM-YYYY")
@@ -919,14 +913,14 @@ function Index() {
         row?.status == "NA"
           ? "Not Assigned"
           : row?.status == "NoShow"
-          ? "No Show"
-          : row?.status == "Cart"
-          ? "Cart"
-          : row?.status == "Incomplete"
-          ? "Incomplete"
-          : row?.status == "ReportAwaited"
-          ? "Report Awaited"
-          : row?.status,
+            ? "No Show"
+            : row?.status == "Cart"
+              ? "Cart"
+              : row?.status == "Incomplete"
+                ? "Incomplete"
+                : row?.status == "ReportAwaited"
+                  ? "Report Awaited"
+                  : row?.status,
     }));
     // alert(row.languageId.name)
 
@@ -942,7 +936,7 @@ function Index() {
         debouncedDoctorSearchText ? `_Dr. ${debouncedDoctorSearchText}` : ""
       }${
         debouncedPatientSearchText ? `_${debouncedPatientSearchText}` : ""
-      }.xlsx`
+      }.xlsx`,
     );
   };
   return (
@@ -1017,7 +1011,7 @@ function Index() {
               current: pagination?.current,
               defaultPageSize: +pageSize
                 ? +pageSize
-                : +pagination.pageSize ?? 10,
+                : (+pagination.pageSize ?? 10),
               responsive: true,
               total: pagination.total,
               showSizeChanger: true,
