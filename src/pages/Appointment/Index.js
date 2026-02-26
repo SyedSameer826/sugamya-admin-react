@@ -8,7 +8,7 @@ import {
   Tag,
   Tooltip,
 } from "antd";
-
+import Plus from "../../assets/images/plus.svg";
 import moment from "moment";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -22,6 +22,8 @@ import { Severty, ShowToast } from "../../helper/toast";
 import useDebounce from "../../hooks/useDebounce";
 import useRequest from "../../hooks/useRequest";
 import AddForm from "./AddForm";
+import UpdateScheduledAppointmentForm from "./UpdateScheduledAppointmentForm";
+import AddAppointmentForm from "./AddAppointmentForm";
 import ChangeDoctor from "./ChangeDoctor";
 import { IstConvert } from "../../helper/functions";
 
@@ -67,6 +69,8 @@ function Index() {
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [visibleAddAppointment, setVisibleAddAppointment] = useState(false);
+  const [visibleUpdateSchedule, setUpdateScheduleVisible] = useState(false);
   const [modal, setModal] = useState(false);
   //For Filters
   const [filter, setFilter] = useState();
@@ -685,6 +689,20 @@ function Index() {
 
         return (
           <>
+            {record?.appointment_status != "pending" && (
+              <Tooltip title={"Edit"} color={"purple"} key={"edit"}>
+                <Button
+                  className="edit-cls btnStyle primary_btn"
+                  onClick={() => {
+                    setSelected(record);
+                    setUpdateScheduleVisible(true);
+                  }}
+                >
+                  <i class="fas fa-edit"></i>
+                </Button>
+              </Tooltip>
+            )}
+
             {record?.appointment_status === "pending" &&
               record?.status === "NA" &&
               record?.appointment_category !== "Emergency" &&
@@ -997,6 +1015,18 @@ function Index() {
               >
                 Export
               </Button>
+              <Button
+                className="primary_btn btnStyle"
+                onClick={(e) => {
+                  setVisibleAddAppointment(true);
+                  setSearchText("");
+                }}
+              >
+                <span className="add-Ic">
+                  <img src={Plus} />
+                </span>
+                Add Appointment
+              </Button>
             </div>
           </>
         }
@@ -1037,7 +1067,31 @@ function Index() {
           refresh={() => setRefresh((prev) => !prev)}
         />
       )}
-
+      {visibleAddAppointment && (
+        <AddAppointmentForm
+          section={sectionName}
+          api={api}
+          show={visibleAddAppointment}
+          hide={() => {
+            setSelected();
+            setVisibleAddAppointment(false);
+          }}
+          data={selected}
+          refresh={() => setRefresh((prev) => !prev)}
+        />
+      )}
+      {visibleUpdateSchedule && (
+        <UpdateScheduledAppointmentForm
+          section={sectionName}
+          api={api}
+          show={visibleUpdateSchedule}
+          hide={() => {
+            setUpdateScheduleVisible(false);
+          }}
+          data={selected}
+          refresh={() => setRefresh((prev) => !prev)}
+        />
+      )}
       {/* {modal && (
         <ChangeDoctor
           section={sectionName}

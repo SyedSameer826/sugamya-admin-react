@@ -20,8 +20,8 @@ if (appMode === "development") {
   // URL = "http://localhost:9061/api/";
   // URL = "https://backend.sugamya-ayurveda.com/api/";
   // URL = "http://43.205.167.204/api/";
-  URL = "https://goldenpark.vayuz.com/api/";
-  // URL = "http://localhost:5000/api/";
+  // URL = "https://goldenpark.vayuz.com/api/";
+  URL = "http://localhost:5000/api/";
 }
 
 let apiPath = {
@@ -88,11 +88,14 @@ let apiPath = {
   policy: "admin/refund/policy/",
   // appointment base price
   appointment: "admin/appointment",
+  updateAppointmentSchedule: "admin/appointment/update",
   order: "admin/Order",
   viewAppointment: "admin/appointment",
   updateAppointment: "admin/appointment/update-documents",
   appointmentPrice: "admin/appointment/price",
-
+  calculatedAmount: "/app/user/calculated-Amount",
+  fileUpload: "/file-upload",
+  addAppointment: "/app/user/add-appointment",
   //Address
   address: "admin/user/addAddress",
   editAddress: "admin/user/editAddress",
@@ -146,6 +149,7 @@ let apiPath = {
   userReviews: "admin/reviews/user-reviews",
   testimonial: "admin/reviews/testimonial",
   addEditReview: "admin/reviews/update-testimonial",
+  addReview: "admin/reviews/add-testimonial",
   deleteReview: "admin/reviews/delete/",
   statusReview: "admin/reviews/status",
 

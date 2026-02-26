@@ -12,7 +12,7 @@ import moment from "moment";
 import ChatRepository from "./ChatRepository";
 import { AppStateContext } from "../../context/AppContext";
 
-import { Image, Upload, Button } from "antd";
+import { Image, Upload, Button, Badge } from "antd";
 import UploadBtnImg from "../../assets/images/paper-pin.png";
 import useRequest from "../../hooks/useRequest";
 import { Col } from "antd";
@@ -21,8 +21,7 @@ import { firebase } from "../../config/firebase";
 import lang from "../../helper/langHelper";
 
 import { Severty, ShowToast } from "../../helper/toast";
-const baseUrl =
-  "https://s3-noi.aces3.ai/sugamaya-bucket/";
+const baseUrl = "https://s3-noi.aces3.ai/sugamaya-bucket/";
 
 function Chat() {
   const heading = lang("Chat Support");
@@ -37,21 +36,22 @@ function Chat() {
   useEffect(() => {
     const unsubscribe = chatRepo.getAllMyGroups().onSnapshot((snapshot) => {
       console.log(snapshot, "snapshot of groups");
-      const sortedGroups =snapshot.docs.map((doc) => doc.data());
-      
-      const groupData =  sortedGroups.sort((a, b) => {
+      const sortedGroups = snapshot.docs.map((doc) => doc.data());
+      console.log(sortedGroups, "sortedGroups...........>>>>>>>");
+
+      const groupData = sortedGroups.sort((a, b) => {
         const timeA = a.lastMessageTime?.toDate?.() || new Date(0);
         const timeB = b.lastMessageTime?.toDate?.() || new Date(0);
         return timeB - timeA; // Descending order: newest first
       });
-    
+
       setGroups(groupData);
       // setGroups(groupData);
       console.log(groupData, "group data>>>>>>>");
       if (groupData?.length && !selected) {
         // const userData = groupData[0]?.userData[0];
         const oppositeUser = groupData[0]?.chatID;
-        console.log(groupData[0].user, "::::::::user")
+        console.log(groupData[0].user, "::::::::user");
         setUser(groupData[0].user?.userID);
         setSelected(oppositeUser);
       }
@@ -72,18 +72,17 @@ function Chat() {
           setSelected={setSelected}
           setUser={setUser}
         />
-        {selected && <ChatDetails
-          selected={selected}
-          user={user}
-          refresh={() => setRefresh((prev) => !prev)}
-        /> }
+        {selected && (
+          <ChatDetails
+            selected={selected}
+            user={user}
+            refresh={() => setRefresh((prev) => !prev)}
+          />
+        )}
       </div>
     </div>
   );
 }
-
-
-
 
 const Inbox = ({ groups, setSelected, setUser, selected }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,17 +90,16 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
   const [gd, setGd] = useState([]);
 
   useEffect(() => {
-    const sortedGroups = groups
-      .filter((group) => {
-        const userName = group.user?.userName?.toLowerCase() || "";
-        const searchLowerCase = searchTerm.toLowerCase();
-        return userName.includes(searchLowerCase);
-      })
-      // .sort((a, b) => {
-      //   const aTime = a.last_message?.time?.toDate().getTime() || 0;
-      //   const bTime = b.last_message?.time?.toDate().getTime() || 0;
-      //   return bTime - aTime; // Descending order
-      // }
+    const sortedGroups = groups.filter((group) => {
+      const userName = group.user?.userName?.toLowerCase() || "";
+      const searchLowerCase = searchTerm.toLowerCase();
+      return userName.includes(searchLowerCase);
+    });
+    // .sort((a, b) => {
+    //   const aTime = a.last_message?.time?.toDate().getTime() || 0;
+    //   const bTime = b.last_message?.time?.toDate().getTime() || 0;
+    //   return bTime - aTime; // Descending order
+    // }
     // );
 
     setGd(sortedGroups);
@@ -111,14 +109,11 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
       setSelected(firstGroup.chatID);
       setUser(firstGroup.user);
     }
-  }, [groups, searchTerm,setSelectedGroup, setSelected, setUser]);
+  }, [groups, searchTerm, setSelectedGroup, setSelected, setUser]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
-
- 
-
 
   if (groups.length === 0) {
     return (
@@ -153,51 +148,73 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
         <div className="users-chat-massage-maain">
           {gd?.map((group, index) => {
             const oppositeUser = group.user;
-
-         
-              const isSelected =  selectedGroup === group.chatID;
-              return (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setUser(oppositeUser);
-                    setSelected(group.chatID);
-                    setSelectedGroup(group.chatID)
-                  }}
-                  className={`users-chat-massage d-flex align-items-center ${
-                    isSelected ? "active-chat-user" : ""
-                  }`} 
-                >
-                  <div className="img-chat mr-3">
-                    <img
-                      src={
-                        oppositeUser?.userImage &&
-                        oppositeUser?.userImage === ""
-                          ? Send133Img
-                          : oppositeUser?.userImage
-                      }
-                      alt=""
-                      className="rounded-circle"
-                      style={{ width: "50px", height: "50px" }}
-                    />
+            const unReadCount =
+              group?.unreadMessages?.[group?.admin?.adminID] || "";
+            const isSelected = selectedGroup === group.chatID;
+            return (
+              <div
+                key={index}
+                onClick={() => {
+                  setUser(oppositeUser);
+                  setSelected(group.chatID);
+                  setSelectedGroup(group.chatID);
+                }}
+                className={`users-chat-massage d-flex align-items-center ${
+                  isSelected ? "active-chat-user" : ""
+                }`}
+              >
+                <div className="img-chat mr-3">
+                  <img
+                    src={
+                      oppositeUser?.userImage && oppositeUser?.userImage === ""
+                        ? Send133Img
+                        : oppositeUser?.userImage
+                    }
+                    alt=""
+                    className="rounded-circle"
+                    style={{ width: "50px", height: "50px" }}
+                  />
+                </div>
+                <div className="chat-txxt">
+                  <div className="chat_1-maa d-flex justify-content-between">
+                    <h2 className="h5 mb-1">
+                      {group.user?.userName}-
+                      {/* {group.user?.userID?.slice(-4)?.toUpperCase() || ""} */}
+                    </h2>
+                    <p className="text-muted small">
+                      {moment(group?.last_message?.time?.toDate()).format(
+                        "hh:mm A",
+                      )}
+                      {console.log("groupgroup---", group)}
+                    </p>
                   </div>
-                  <div className="chat-txxt">
-                    <div className="chat_1-maa d-flex justify-content-between">
-                      <h2 className="h5 mb-1">{group.user?.userName}</h2>
-                      <p className="text-muted small">
-                        {moment(
-                          group?.last_message?.time?.toDate()
-                        ).format("hh:mm A")}
-                        {console.log("groupgroup---", group)}
-                      </p>
-                    </div>
-                    <div className="massage-chat-main">
-                      <h3 className="small text-muted">{group?.last_message?.message}</h3>
-                    </div>
+                  <div
+                    className="massage-chat-main "
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <h3 className="small text-muted">
+                      {group?.last_message?.message}
+                    </h3>
+                    {/* <p> */}
+                    {/* {unReadCount > 0 && (
+                        <span className="unread-count">{unReadCount}</span>
+                      )}
+                       */}
+                    {unReadCount > 0 && (
+                      <Badge
+                        count={unReadCount}
+                        size="small"
+                        style={{
+                          backgroundColor: "#fb035c",
+                          color: "#fff",
+                        }}
+                      />
+                    )}
+                    {/* </p> */}
                   </div>
                 </div>
-              );
-           
+              </div>
+            );
 
             return null; // Return null if there's no lastMessage
           })}
@@ -239,9 +256,8 @@ const ChatDetails = ({ selected, user, refresh }) => {
   //       scroll?.current?.scrollIntoView({ behavior: "smooth" });
   //     })
   //     .catch((error) => {});
-   
-  // }, [selected ,refresh]);
 
+  // }, [selected ,refresh]);
 
   useEffect(() => {
     if (!selected) return;
@@ -260,8 +276,7 @@ const ChatDetails = ({ selected, user, refresh }) => {
       });
 
     return () => unsubscribe();
-  }, [selected,refresh]);
-
+  }, [selected, refresh]);
 
   // Automatically scroll to the last message when messages update
   useEffect(() => {
@@ -279,38 +294,40 @@ const ChatDetails = ({ selected, user, refresh }) => {
         createdAt: serverTimestamp(),
         senderId: userId?._id,
         chatID: selected,
-        messageType: ["png", "jpg", "jpeg","Document"].some((ext) => msg.includes(ext))
+        messageType: ["png", "jpg", "jpeg", "Document"].some((ext) =>
+          msg.includes(ext),
+        )
           ? "Image"
           : msg.includes("pdf")
-          ? "pdf"
-          : msg.includes("mp4")
-          ? "video"
-          : "Text",
+            ? "pdf"
+            : msg.includes("mp4")
+              ? "video"
+              : "Text",
       };
-      console.log(user, "user details>>>>>>>>")
+      console.log(user, "user details>>>>>>>>");
       chatRepo.updateSeenMessages(selected, userId, msg);
       chatRepo.sendMessage(message, selected);
       const data = {
-        from_id: userId?._id, 
-        to_id: user?.userID, 
-        title: "", 
-        description: `Dear ${user?.userName}, support has sent you a new message.`, 
-        data:{
-
-          "action": "chat",
-  "type": "null",
-  "click_action": "FLUTTER_NOTIFICATION_CLICK",
-  "image": null,
-  "agoraToken": null,
-  "channelName": null,
-  "title": "New Message",
-  "body": `Dear ${user?.userName}, support has sent you a new message.`,
-  "callerToken": null,
-  "callType": null,
-  "senderId": userId?._id,
-  "receiverId": user?.userID
-        }}
-        console.log(data, "data to send notification");
+        from_id: userId?._id,
+        to_id: user?.userID,
+        title: "",
+        description: `Dear ${user?.userName}, support has sent you a new message.`,
+        data: {
+          action: "chat",
+          type: "null",
+          click_action: "FLUTTER_NOTIFICATION_CLICK",
+          image: null,
+          agoraToken: null,
+          channelName: null,
+          title: "New Message",
+          body: `Dear ${user?.userName}, support has sent you a new message.`,
+          callerToken: null,
+          callType: null,
+          senderId: userId?._id,
+          receiverId: user?.userID,
+        },
+      };
+      console.log(data, "data to send notification");
       request({
         url: apiPath.common.sendNotification,
         method: "POST",
@@ -469,7 +486,7 @@ const Receive = ({ data, user }) => {
         <p>{data?.message}</p> */}
         {data.messageType == "Text" ? (
           <h3 class="txt">{data?.message}</h3>
-        ) : data.messageType == "pdf"  || data.messageType == "Document"? (
+        ) : data.messageType == "pdf" || data.messageType == "Document" ? (
           <a
             href={baseUrl + data.message}
             target="_blank"

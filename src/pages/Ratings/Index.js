@@ -10,6 +10,8 @@ import {
   Tabs,
   Select,
 } from "antd";
+import AddReviewRatingForm from "./AddReviewRatingForm.js";
+import Plus from "../../assets/images/plus.svg";
 import { StarFilled } from "@ant-design/icons";
 import React, { useState, useEffect, useContext } from "react";
 import useRequest from "../../hooks/useRequest";
@@ -28,6 +30,7 @@ import ReviewForm from "./EditForm";
 import moment from "moment";
 import { Link } from "react-router-dom";
 import { set } from "lodash";
+import AddAppointment from "../User/Patient/AddAppointment.js";
 
 const Search = Input.Search;
 const { TabPane } = Tabs;
@@ -45,9 +48,12 @@ function Index() {
     testimonial: apiPath.testimonial,
     status: apiPath.statusReview,
     addEdit: apiPath.addEditReview,
+    appointment: apiPath.appointment,
+    addReview: apiPath.addReview,
   };
 
   const [searchText, setSearchText] = useState("");
+  const [visibleAddReviewRating, setVisibleAddReviewRating] = useState(false);
   const { request } = useRequest();
   const { showConfirm } = ConfirmationBox();
   const [list, setList] = useState([]);
@@ -498,9 +504,24 @@ function Index() {
 
           <TabPane className="blogs-tab" tab="User Testimonial" key="3">
             <div className="table-responsive customPagination">
-              <h4 className="text-right">
-                Total Records: {testPagination.total ? testPagination.total : 0}
-              </h4>
+              <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+                <Button
+                  className="primary_btn btnStyle"
+                  onClick={(e) => {
+                    setVisibleAddReviewRating(true);
+                    setSearchText("");
+                  }}
+                >
+                  <span className="add-Ic">
+                    <img src={Plus} />
+                  </span>
+                  Add Reviews & Rating
+                </Button>
+                <h4 className="text-right">
+                  Total Records:{" "}
+                  {testPagination.total ? testPagination.total : 0}
+                </h4>
+              </div>
 
               <Table
                 loading={loading}
@@ -528,6 +549,19 @@ function Index() {
           hide={() => {
             setSelected();
             setVisible(false);
+          }}
+          data={selected}
+          refresh={() => setRefresh((prev) => !prev)}
+        />
+      )}
+      {visibleAddReviewRating && (
+        <AddReviewRatingForm
+          section={sectionName}
+          api={api}
+          show={visibleAddReviewRating}
+          hide={() => {
+            setSelected();
+            setVisibleAddReviewRating(false);
           }}
           data={selected}
           refresh={() => setRefresh((prev) => !prev)}
