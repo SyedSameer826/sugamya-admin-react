@@ -30,7 +30,7 @@ function View() {
   const [patient, setPatient] = useState({});
   const [appointments, setPatientAppointment] = useState([]);
   const [patientCart, setPatientCart] = useState([]);
-  const [patientAge, setPatientAge] = useState();
+  // const [patientAge, setPatientAge] = useState();
   const [patientTransactions, setPatientTransactions] = useState([]);
   const [patientOrders, setPatientOrder] = useState([]);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
@@ -46,7 +46,7 @@ function View() {
         if (!status) return;
         setLoading(false);
         setPatient(data);
-        setPatientAge(calculateAge(data.dob));
+        // setPatientAge(calculateAge(data.dob));
       },
       onError: (error) => {
         ShowToast(error, Severty.ERROR);
@@ -63,7 +63,7 @@ function View() {
         setLoading(false);
         setPatientAppointment(data);
         fetchDoctors(data);
-        setPatientAge(calculateAge(data.dob));
+        // setPatientAge(calculateAge(data.dob));
       },
       onError: (error) => {
         ShowToast(error, Severty.ERROR);
@@ -134,7 +134,7 @@ function View() {
         };
       }
     });
-    const uniqueDoctorsArray = Object.values(uniqueDoctors);
+    // const uniqueDoctorsArray = Object.values(uniqueDoctors);
   };
 
   useEffect(() => {
@@ -169,7 +169,7 @@ function View() {
           <span
             className="cap"
             style={{ color: "red", cursor: "pointer" }}
-          // onClick={() => navigate(`/patient/view/${patient_id._id}`)}
+            // onClick={() => navigate(`/patient/view/${patient_id._id}`)}
           >
             {patient_id?.uhid}
           </span>
@@ -195,14 +195,11 @@ function View() {
                 <span className="cap">{patient_id?.name}</span>
                 <span className="cap">{patient_id?.email}</span>
 
-                {patient_id?.mobile_number &&
-                  patient_id?.country_code && (
-                    <span style={{ color: "gray", fontSize: "12px" }}>
-                      {patient_id?.country_code +
-                        "-" +
-                        patient_id?.mobile_number}
-                    </span>
-                  )}
+                {patient_id?.mobile_number && patient_id?.country_code && (
+                  <span style={{ color: "gray", fontSize: "12px" }}>
+                    {patient_id?.country_code + "-" + patient_id?.mobile_number}
+                  </span>
+                )}
                 {booked_for && (
                   <Tag
                     color={
@@ -285,19 +282,19 @@ function View() {
       dataIndex: "doctor_id",
       key: "doctor_id",
       render: (_, { doctor_id }) =>
-      // <Image width={50} src={image ? apiPath.assetURL + image : notfound} />
-      {
-        return (
-          <Link
-            style={{ color: "blue" }}
-            to={`/doctor/view/${doctor_id?._id}`}
-          >
-            {doctor_id?.name}
-          </Link>
-        );
-      },
+        // <Image width={50} src={image ? apiPath.assetURL + image : notfound} />
+        {
+          return (
+            <Link
+              style={{ color: "blue" }}
+              to={`/doctor/view/${doctor_id?._id}`}
+            >
+              {doctor_id?.name}
+            </Link>
+          );
+        },
     },
-   
+
     {
       title: "Appt Type",
       key: "appointment_type",
@@ -362,7 +359,12 @@ function View() {
       },
       render: (_, { uhid, transaction_id }) => {
         return uhid ? (
-          <Link style={{ cursor: "pointer" }} to={`/${routeName}/view/${transaction_id}`}>{uhid}</Link>
+          <Link
+            style={{ cursor: "pointer" }}
+            to={`/${routeName}/view/${transaction_id}`}
+          >
+            {uhid}
+          </Link>
         ) : (
           transaction_id
         );
@@ -384,7 +386,8 @@ function View() {
       title: "Transaction Date",
       key: "date_time_transaction",
       dataIndex: "date_time_transaction",
-      sorter: (a, b) => moment(a?.created_at).unix() - moment(b?.created_at).unix(),
+      sorter: (a, b) =>
+        moment(a?.created_at).unix() - moment(b?.created_at).unix(),
       render: (_, { created_at }) => {
         return moment(created_at).format("DD-MM-YYYY");
       },
@@ -405,22 +408,21 @@ function View() {
                   gap: 4,
                 }}
               >
-                <span className="cap"
+                <span
+                  className="cap"
                   style={{ color: "red", cursor: "pointer" }}
                   onClick={() => navigate(`/patient/view/${patient_id._id}`)}
-
-                >{patient_id?.uhid}</span>
+                >
+                  {patient_id?.uhid}
+                </span>
                 <span className="cap">{patient_id?.name}</span>
                 <span className="cap">{patient_id?.email}</span>
 
-                {patient_id?.mobile_number &&
-                  patient_id?.country_code && (
-                    <span style={{ color: "gray", fontSize: "12px" }}>
-                      {patient_id?.country_code +
-                        "-" +
-                        patient_id?.mobile_number}
-                    </span>
-                  )}
+                {patient_id?.mobile_number && patient_id?.country_code && (
+                  <span style={{ color: "gray", fontSize: "12px" }}>
+                    {patient_id?.country_code + "-" + patient_id?.mobile_number}
+                  </span>
+                )}
                 {/* {booked_for && (
                       <Tag
                         color={
@@ -453,13 +455,20 @@ function View() {
       filterMultiple: false,
       width: 200,
       render: (_, { appointment_id }) => {
-        return appointment_id && appointment_id.appointment_id
-          ? <Link to={`/appointment/view/${appointment_id._id}`}> {appointment_id.appointment_id} </Link>
-          : "";
+        return appointment_id && appointment_id.appointment_id ? (
+          <Link to={`/appointment/view/${appointment_id._id}`}>
+            {" "}
+            {appointment_id.appointment_id}{" "}
+          </Link>
+        ) : (
+          ""
+        );
       },
       sorter: (a, b) => {
         if (a.appointment_id && b.appointment_id) {
-          return a.appointment_id.appointment_id.localeCompare(b.appointment_id.appointment_id);
+          return a.appointment_id.appointment_id.localeCompare(
+            b.appointment_id.appointment_id,
+          );
         }
         return 0;
       },
@@ -514,11 +523,7 @@ function View() {
       dataIndex: "gst_amount",
       key: "gst_amount",
       render: (_, { gst_amount, discountedPrice }) =>
-        gst_amount ? (
-          <span className="cap">${gst_amount}</span>
-        ) : (
-          "$0"
-        ),
+        gst_amount ? <span className="cap">${gst_amount}</span> : "$0",
     },
     {
       title: "Payment Mode",
@@ -616,7 +621,8 @@ function View() {
       dataIndex: "cartExpiry",
       key: "cartExpiry",
       sorter: (a, b) =>
-        moment(a?.cartExpiry, "DD-MM-YYYY").unix() - moment(b?.cartExpiry, "DD-MM-YYYY").unix(),
+        moment(a?.cartExpiry, "DD-MM-YYYY").unix() -
+        moment(b?.cartExpiry, "DD-MM-YYYY").unix(),
       render: (_, { cartExpiry }) => {
         return cartExpiry ? cartExpiry : "-";
       },
@@ -641,12 +647,12 @@ function View() {
         <>
           {products?.length
             ? products?.map((product, index) => (
-              <div key={index} style={{ marginBottom: "8px" }}>
-                <span style={{ marginLeft: "12px" }}>
-                  {product?.productDetails?.[0]?.name} - {product?.qty}
-                </span>
-              </div>
-            ))
+                <div key={index} style={{ marginBottom: "8px" }}>
+                  <span style={{ marginLeft: "12px" }}>
+                    {product?.productDetails?.[0]?.name} - {product?.qty}
+                  </span>
+                </div>
+              ))
             : "-"}
         </>
       ),
@@ -767,28 +773,32 @@ function View() {
       onFilter: (value, record) => record.cartStatus === value,
       render: (cartStatus, record) => (
         <>
-          {record?.cartStatus == "checkout" ? <Tag
-            color={"green"}
-          // onClick={() => {
-          //   setShowStatus(true); // Open the modal
-          //   setSelected(record); // Set the selected cart item
-          // }}
-          // style={{ cursor: "pointer" }}
-          >
-            {cartStatus}
-          </Tag> : <Tag
-            color={
-              cartStatus === "checkout"
-                ? "green"
-                : cartStatus === "expiry"
-                  ? "red"
-                  : "orange"
-            }
-            // onClick={() => handleCartStatus(record)}
-            style={{ cursor: "pointer" }}
-          >
-            {cartStatus}
-          </Tag>}
+          {record?.cartStatus == "checkout" ? (
+            <Tag
+              color={"green"}
+              // onClick={() => {
+              //   setShowStatus(true); // Open the modal
+              //   setSelected(record); // Set the selected cart item
+              // }}
+              // style={{ cursor: "pointer" }}
+            >
+              {cartStatus}
+            </Tag>
+          ) : (
+            <Tag
+              color={
+                cartStatus === "checkout"
+                  ? "green"
+                  : cartStatus === "expiry"
+                    ? "red"
+                    : "orange"
+              }
+              // onClick={() => handleCartStatus(record)}
+              style={{ cursor: "pointer" }}
+            >
+              {cartStatus}
+            </Tag>
+          )}
         </>
       ),
     },
@@ -929,7 +939,7 @@ function View() {
           b.appointmentDetails.appointment_id
         ) {
           return a.appointmentDetails.appointment_id.localeCompare(
-            b.appointmentDetails.appointment_id
+            b.appointmentDetails.appointment_id,
           );
         }
         return 0;
@@ -1072,7 +1082,7 @@ function View() {
               value={orderStatus}
               style={{ width: 120 }}
               disabled
-            // onChange={(value) => handleChangeStatus(_id, value, "type")}
+              // onChange={(value) => handleChangeStatus(_id, value, "type")}
             >
               <Option value="Received">Received</Option>
               <Option value="Shipped">Shipped</Option>
@@ -1200,8 +1210,13 @@ function View() {
                 } */}
 
                 {patient?.file?.length ? (
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <h5 style={{ margin: 0 }}>Patient Documents:</h5>
 
                     <div style={{ display: "flex", gap: "15px" }}>
@@ -1209,16 +1224,25 @@ function View() {
                         patient?.file?.map((doc) => {
                           const ext = doc.split(".").pop().toLowerCase();
 
-                          const isImage = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext);
+                          const isImage = [
+                            "jpg",
+                            "jpeg",
+                            "png",
+                            "webp",
+                            "gif",
+                          ].includes(ext);
                           const isPDF = ext === "pdf";
 
                           const handleDownload = async (e) => {
                             e.preventDefault();
                             try {
-                              const response = await fetch(apiPath.assetURL + doc);
+                              const response = await fetch(
+                                apiPath.assetURL + doc,
+                              );
                               const blob = await response.blob();
                               const url = window.URL.createObjectURL(blob);
-                              const formattedDate = moment().format("DD_MM_YYYY");
+                              const formattedDate =
+                                moment().format("DD_MM_YYYY");
                               const fileName = `${formattedDate}_${patient?.uhid}_${patient?.name}.${ext}`;
 
                               const a = document.createElement("a");
@@ -1262,7 +1286,6 @@ function View() {
                         })}
                     </div>
                   </div>
-
                 ) : (
                   ""
                 )}

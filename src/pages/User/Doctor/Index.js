@@ -670,15 +670,15 @@ function Index() {
     setPagination({ current: 1, pageSize: pagination?.pageSize });
   };
 
-  const handleChangeDate = (e) => {
-    if (e != null) {
-      setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
-      setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
-    } else {
-      setStartDate();
-      setEndDate();
-    }
-  };
+  // const handleChangeDate = (e) => {
+  //   if (e != null) {
+  //     setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
+  //     setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
+  //   } else {
+  //     setStartDate();
+  //     setEndDate();
+  //   }
+  // };
 
   const getExportData = async (pagination, filters) => {
     console.log(filters, "filters>>>>>>>>>>>>>>>>>..........");

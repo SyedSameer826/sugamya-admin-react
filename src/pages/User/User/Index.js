@@ -89,25 +89,24 @@ function Index() {
   const [rowfilter, setRowFilter] = useState();
 
   const onDelete = (id) => {
-  setLoading(true); // show page/table loader
+    setLoading(true); // show page/table loader
 
-  request({
-    url: api.patient + "/" + id,
-    method: "DELETE",
-    onSuccess: (data) => {
-      ShowToast(data.message, Severty.SUCCESS);
-      setLoading(false); // hide loader after API success
-      setRefresh((prev) => !prev); // refresh table
-      setShowDelete(false); // close delete modal
-      setSelected(); // clear selected record
-    },
-    onError: (error) => {
-      setLoading(false); // hide loader on error
-      ShowToast(error, Severty.ERROR);
-    },
-  });
-};
-
+    request({
+      url: api.patient + "/" + id,
+      method: "DELETE",
+      onSuccess: (data) => {
+        ShowToast(data.message, Severty.SUCCESS);
+        setLoading(false); // hide loader after API success
+        setRefresh((prev) => !prev); // refresh table
+        setShowDelete(false); // close delete modal
+        setSelected(); // clear selected record
+      },
+      onError: (error) => {
+        setLoading(false); // hide loader on error
+        ShowToast(error, Severty.ERROR);
+      },
+    });
+  };
 
   const calculateAge = (dob) => {
     console.log("dob????????????????", dob);
@@ -294,10 +293,10 @@ function Index() {
               ? age.years && age.years !== 0
                 ? `${age.years} years`
                 : age.months && age.months !== 0
-                ? `${age.months} months`
-                : age.days && age.days !== 0
-                ? `${age.days} days`
-                : "-"
+                  ? `${age.months} months`
+                  : age.days && age.days !== 0
+                    ? `${age.days} days`
+                    : "-"
               : "-"}
           </span>
         );
@@ -448,7 +447,11 @@ function Index() {
                   >
                     <Button
                       className="btnStyle primary_btn"
-                      onClick={(e) => navigate(`/user-devices/${record._id}`,{state : { data : record}})}
+                      onClick={(e) =>
+                        navigate(`/user-devices/${record._id}`, {
+                          state: { data: record },
+                        })
+                      }
                     >
                       <i className="fas fa-light fa-history"></i>
                     </Button>
@@ -505,7 +508,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     if (queryString) {
@@ -519,16 +522,16 @@ function Index() {
       `/user${
         queryString
           ? `?${queryString}&search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
           : `?search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
-      }`
+      }`,
     );
 
     request({
@@ -585,15 +588,15 @@ function Index() {
     setPagination({ current: 1, pageSize: pagination?.pageSize });
   };
 
-  const handleChangeDate = (e) => {
-    if (e != null) {
-      setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
-      setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
-    } else {
-      setStartDate();
-      setEndDate();
-    }
-  };
+  // const handleChangeDate = (e) => {
+  //   if (e != null) {
+  //     setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
+  //     setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
+  //   } else {
+  //     setStartDate();
+  //     setEndDate();
+  //   }
+  // };
 
   const handleReset = () => {
     setFilter({
@@ -656,7 +659,7 @@ function Index() {
         .filter(([_, v]) => v)
         .map(
           ([key, value]) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
         )
         .join("&");
       if (queryString) {
@@ -705,39 +708,40 @@ function Index() {
   const excelData = (exportData) => {
     if (!exportData.length) return;
 
-   const data = exportData.map((row, index) => {
-  const nameParts = (row?.name || "").trim().split(" ");
-  const firstName = nameParts[0] || "-";
-  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "-";
+    const data = exportData.map((row, index) => {
+      const nameParts = (row?.name || "").trim().split(" ");
+      const firstName = nameParts[0] || "-";
+      const lastName =
+        nameParts.length > 1 ? nameParts.slice(1).join(" ") : "-";
 
-  return {
-    "S.No.": index + 1,
-    "User Id": row?.uhid || "-",
-    Salutation: row?.salutation || "-",
-    "First Name": firstName,
-    "Last Name": lastName,
-    "Phone Number":
-      row?.country_code && row?.mobile_number
-        ? `+${row.country_code}${row.mobile_number}`
-        : "-",
-    "Email ID": row?.email || "-",
-    Gender: row?.gender || "-",
-    Dob: row?.dob || "-",
-    Age: (() => {
-      const age = calculateAge(row?.dob);
-      return age
-        ? `${age.years} years ${age.months} months ${age.days} days`
-        : "-";
-    })(),
-    City: row?.citiesDet?.name || "-",
-    State: row?.stateDet?.name || "-",
-    Country: row?.countryDet?.name || "-",
-    Status: row?.is_active === true ? "Active" : "Inactive",
-    "Registered Date": row?.created_at
-      ? moment(row.created_at).format("DD-MM-YYYY")
-      : "-",
-  };
-});
+      return {
+        "S.No.": index + 1,
+        "User Id": row?.uhid || "-",
+        Salutation: row?.salutation || "-",
+        "First Name": firstName,
+        "Last Name": lastName,
+        "Phone Number":
+          row?.country_code && row?.mobile_number
+            ? `+${row.country_code}${row.mobile_number}`
+            : "-",
+        "Email ID": row?.email || "-",
+        Gender: row?.gender || "-",
+        Dob: row?.dob || "-",
+        Age: (() => {
+          const age = calculateAge(row?.dob);
+          return age
+            ? `${age.years} years ${age.months} months ${age.days} days`
+            : "-";
+        })(),
+        City: row?.citiesDet?.name || "-",
+        State: row?.stateDet?.name || "-",
+        Country: row?.countryDet?.name || "-",
+        Status: row?.is_active === true ? "Active" : "Inactive",
+        "Registered Date": row?.created_at
+          ? moment(row.created_at).format("DD-MM-YYYY")
+          : "-",
+      };
+    });
 
     // alert(row.languageId.name)
 
@@ -761,7 +765,7 @@ function Index() {
         selectedOptionsCountries ? `_${getfilterName.countryDet?.name}` : ""
       }${selectedState ? `_${getfilterName.stateDet?.name}` : ""}${
         selectedCity ? `_${getfilterName.citiesDet?.name}` : ""
-      }.xlsx`
+      }.xlsx`,
     );
   };
 
@@ -787,30 +791,35 @@ function Index() {
                 /> */}
                 <div className="role-wrap">
                   <DatePicker.RangePicker
-  format="DD-MM-YY" 
-  disabledDate={(current) => current && current > moment().endOf("day")}
-  placeholder={[lang("Start Date"), lang("End Date")]}
-  value={[
-    filter.start_date ? moment(filter.start_date, "YYYY-MM-DD") : null,
-    filter.end_date ? moment(filter.end_date, "YYYY-MM-DD") : null,
-  ]}
-
-  onChange={(value) => {
-    if (value && value[0] && value[1]) {
-      setFilter((prev) => ({
-        ...prev,
-        start_date: moment(value[0]).format("YYYY-MM-DD"),
-        end_date: moment(value[1]).format("YYYY-MM-DD"),
-      }));
-    } else {
-      setFilter((prev) => ({
-        ...prev,
-        start_date: undefined,
-        end_date: undefined,
-      }));
-    }
-  }}
-/>
+                    format="DD-MM-YY"
+                    disabledDate={(current) =>
+                      current && current > moment().endOf("day")
+                    }
+                    placeholder={[lang("Start Date"), lang("End Date")]}
+                    value={[
+                      filter.start_date
+                        ? moment(filter.start_date, "YYYY-MM-DD")
+                        : null,
+                      filter.end_date
+                        ? moment(filter.end_date, "YYYY-MM-DD")
+                        : null,
+                    ]}
+                    onChange={(value) => {
+                      if (value && value[0] && value[1]) {
+                        setFilter((prev) => ({
+                          ...prev,
+                          start_date: moment(value[0]).format("YYYY-MM-DD"),
+                          end_date: moment(value[1]).format("YYYY-MM-DD"),
+                        }));
+                      } else {
+                        setFilter((prev) => ({
+                          ...prev,
+                          start_date: undefined,
+                          end_date: undefined,
+                        }));
+                      }
+                    }}
+                  />
                 </div>
                 <Input.Search
                   className="searchInput"
@@ -921,7 +930,7 @@ function Index() {
               current: pagination?.current,
               defaultPageSize: +pageSize
                 ? +pageSize
-                : +pagination.pageSize ?? 10,
+                : (+pagination.pageSize ?? 10),
               responsive: true,
               total: pagination?.total,
               showSizeChanger: true,

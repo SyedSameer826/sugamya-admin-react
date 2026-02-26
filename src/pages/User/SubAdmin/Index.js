@@ -108,7 +108,7 @@ function Index() {
   const navigate = useNavigate();
 
   const activity = (record) => {
-    navigate(`/user/activity/${record?._id}`,{state : {data : record}});
+    navigate(`/user/activity/${record?._id}`, { state: { data: record } });
   };
 
   const onChange = (key, value) => {
@@ -160,7 +160,7 @@ function Index() {
     {
       title: "Role",
       render: (_, { type }) => {
-        return type ? (type === "Tele-Counsellors" ? "Support" : type)  : "-";
+        return type ? (type === "Tele-Counsellors" ? "Support" : type) : "-";
       },
     },
     {
@@ -226,7 +226,8 @@ function Index() {
       title: "Register Date",
       key: "created_at",
       dataIndex: "created_at",
-      sorter: (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix(),
+      sorter: (a, b) =>
+        moment(a.created_at).unix() - moment(b.created_at).unix(),
       render: (_, { created_at }) => {
         return moment(created_at).format("DD-MM-YYYY");
       },
@@ -297,7 +298,7 @@ function Index() {
                       <i className="fas fa-file-pdf"></i>
                     </div>
                   </a>
-                ) : null
+                ) : null,
               )}
             </div>
 
@@ -429,7 +430,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
 
@@ -443,16 +444,16 @@ function Index() {
       `/sub-admin${
         queryString
           ? `?${queryString}&search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
           : `?search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
-      }`
+      }`,
     );
     request({
       url:
@@ -489,15 +490,15 @@ function Index() {
 
     fetchData(pagination, filters);
   };
-  const handleChangeDate = (e) => {
-    if (e != null) {
-      setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
-      setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
-    } else {
-      setStartDate();
-      setEndDate();
-    }
-  };
+  // const handleChangeDate = (e) => {
+  //   if (e != null) {
+  //     setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
+  //     setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
+  //   } else {
+  //     setStartDate();
+  //     setEndDate();
+  //   }
+  // };
   useEffect(() => {
     setLoading(true);
     fetchData(pagination, tableFilter);
@@ -547,30 +548,35 @@ function Index() {
               </div> */}
               <div className="role-wrap">
                 <DatePicker.RangePicker
-  format="DD-MM-YY" 
-  disabledDate={(current) => current && current > moment().endOf("day")}
-  placeholder={[lang("Start Date"), lang("End Date")]}
-  value={[
-    filter.start_date ? moment(filter.start_date, "YYYY-MM-DD") : null,
-    filter.end_date ? moment(filter.end_date, "YYYY-MM-DD") : null,
-  ]}
-
-  onChange={(value) => {
-    if (value && value[0] && value[1]) {
-      setFilter((prev) => ({
-        ...prev,
-        start_date: moment(value[0]).format("YYYY-MM-DD"),
-        end_date: moment(value[1]).format("YYYY-MM-DD"),
-      }));
-    } else {
-      setFilter((prev) => ({
-        ...prev,
-        start_date: undefined,
-        end_date: undefined,
-      }));
-    }
-  }}
-/>
+                  format="DD-MM-YY"
+                  disabledDate={(current) =>
+                    current && current > moment().endOf("day")
+                  }
+                  placeholder={[lang("Start Date"), lang("End Date")]}
+                  value={[
+                    filter.start_date
+                      ? moment(filter.start_date, "YYYY-MM-DD")
+                      : null,
+                    filter.end_date
+                      ? moment(filter.end_date, "YYYY-MM-DD")
+                      : null,
+                  ]}
+                  onChange={(value) => {
+                    if (value && value[0] && value[1]) {
+                      setFilter((prev) => ({
+                        ...prev,
+                        start_date: moment(value[0]).format("YYYY-MM-DD"),
+                        end_date: moment(value[1]).format("YYYY-MM-DD"),
+                      }));
+                    } else {
+                      setFilter((prev) => ({
+                        ...prev,
+                        start_date: undefined,
+                        end_date: undefined,
+                      }));
+                    }
+                  }}
+                />
               </div>
               <div className="role-wrap">
                 <Select
@@ -629,7 +635,7 @@ function Index() {
         }
       >
         <div className="table-responsive customPagination">
-        <h4 className="text-right">Total Records: {pagination.total ?? 0}</h4>
+          <h4 className="text-right">Total Records: {pagination.total ?? 0}</h4>
 
           <Table
             loading={loading}

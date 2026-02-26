@@ -56,7 +56,7 @@ function Index() {
   const api = {
     patient: apiPath.listPatient,
     addEdit: apiPath.listPatient,
-    addAppointment: apiPath.newAppointment
+    addAppointment: apiPath.newAppointment,
   };
 
   const [searchText, setSearchText] = useState(search ?? "");
@@ -67,7 +67,7 @@ function Index() {
   const [countries, setCountries] = useState();
   const [states, setStates] = useState();
   const [cateList, setCateList] = useState([]);
-  const [visibleAppointment, setVisibleAppointment] = useState(false)
+  const [visibleAppointment, setVisibleAppointment] = useState(false);
   const [cities, setCities] = useState();
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -84,7 +84,6 @@ function Index() {
   const [selectedCate, setSelectedCate] = useState();
   const [exportLoading, setExportLoading] = useState(false);
 
-  
   //For Filters
   const [filter, setFilter] = useState({
     start_date: start_date ?? undefined,
@@ -131,7 +130,7 @@ function Index() {
     });
   };
   const activity = (record) => {
-    navigate(`/user/activity/${record?._id}`,{state : {data :  record}});
+    navigate(`/user/activity/${record?._id}`, { state: { data: record } });
   };
 
   const casePaper = (record) => {
@@ -460,7 +459,8 @@ function Index() {
       title: "Register Date",
       key: "created_at",
       dataIndex: "created_at",
-      sorter: (a, b) => moment(a.created_at).unix() - moment(b.created_at).unix(),
+      sorter: (a, b) =>
+        moment(a.created_at).unix() - moment(b.created_at).unix(),
       render: (_, { created_at }) => {
         return moment(created_at).format("DD-MM-YYYY");
       },
@@ -496,7 +496,8 @@ function Index() {
                     className="btnStyle primary_btn"
                     onClick={() => {
                       setSelected(record);
-                      setVisibleAppointment(true)}}
+                      setVisibleAppointment(true);
+                    }}
                   >
                     Create Appointment
                   </Button>
@@ -616,7 +617,7 @@ function Index() {
       .filter(([_, v]) => v)
       .map(
         ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
       .join("&");
     if (queryString) {
@@ -630,16 +631,16 @@ function Index() {
       `/patient${
         queryString
           ? `?${queryString}&search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
           : `?search=${encodeURIComponent(
-              debouncedSearchText
+              debouncedSearchText,
             )}&page=${encodeURIComponent(
-              pagination.current ?? 1
+              pagination.current ?? 1,
             )}&pageSize=${encodeURIComponent(pagination.pageSize ?? 10)}`
-      }`
+      }`,
     );
 
     request({
@@ -691,15 +692,15 @@ function Index() {
     setSearchText(e.target.value);
   };
 
-  const handleChangeDate = (e) => {
-    if (e != null) {
-      setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
-      setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
-    } else {
-      setStartDate();
-      setEndDate();
-    }
-  };
+  // const handleChangeDate = (e) => {
+  //   if (e != null) {
+  //     setStartDate(moment(e[0]._d).format("DD-MM-YYYY"));
+  //     setEndDate(moment(e[1]._d).format("DD-MM-YYYY"));
+  //   } else {
+  //     setStartDate();
+  //     setEndDate();
+  //   }
+  // };
 
   const handleReset = () => {
     setFilter({
@@ -741,7 +742,7 @@ function Index() {
         .filter(([_, v]) => v)
         .map(
           ([key, value]) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
         )
         .join("&");
       if (queryString) {
@@ -817,9 +818,10 @@ function Index() {
         ? row?.relationship_with_user
         : "-",
       "Ailment Category": row?.categoryId?.name ? row?.categoryId?.name : "-",
-       "Ailment": row?.ailmentId?.length > 0
-    ? row.ailmentId.map((ailment) => ailment.name).join(", ")
-    : "-",
+      Ailment:
+        row?.ailmentId?.length > 0
+          ? row.ailmentId.map((ailment) => ailment.name).join(", ")
+          : "-",
       "Billing Postal Code": row?.postal_code ? row?.postal_code : "-",
       // Location: row.location,
       "Billing City": row?.citiesDet?.name ? row?.citiesDet?.name : "-",
@@ -831,7 +833,7 @@ function Index() {
         : "-",
     }));
     // alert(row.languageId.name)
-    const getfilterName =  exportData?.[0]
+    const getfilterName = exportData?.[0];
 
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -852,7 +854,7 @@ function Index() {
         selectedOptionsCountries ? `_${getfilterName.countryDet?.name}` : ""
       }${selectedState ? `_${getfilterName.stateDet?.name}` : ""}${
         selectedCity ? `_${getfilterName.citiesDet?.name}` : ""
-      }.xlsx`
+      }.xlsx`,
     );
   };
 
@@ -875,14 +877,19 @@ function Index() {
                 /> */}
                 <div className="role-wrap">
                   <DatePicker.RangePicker
-                    format="DD-MM-YY" 
-                    disabledDate={(current) => current && current > moment().endOf("day")}
+                    format="DD-MM-YY"
+                    disabledDate={(current) =>
+                      current && current > moment().endOf("day")
+                    }
                     placeholder={[lang("Start Date"), lang("End Date")]}
                     value={[
-                      filter.start_date ? moment(filter.start_date, "YYYY-MM-DD") : null,
-                      filter.end_date ? moment(filter.end_date, "YYYY-MM-DD") : null,
+                      filter.start_date
+                        ? moment(filter.start_date, "YYYY-MM-DD")
+                        : null,
+                      filter.end_date
+                        ? moment(filter.end_date, "YYYY-MM-DD")
+                        : null,
                     ]}
-                  
                     onChange={(value) => {
                       if (value && value[0] && value[1]) {
                         setFilter((prev) => ({
@@ -1049,7 +1056,7 @@ function Index() {
               current: pagination?.current,
               defaultPageSize: +pageSize
                 ? +pageSize
-                : +pagination.pageSize ?? 10,
+                : (+pagination.pageSize ?? 10),
               responsive: true,
               total: pagination.total,
               showSizeChanger: true,
@@ -1065,9 +1072,8 @@ function Index() {
         </div>
       </SectionWrapper>
 
-      {
-        visibleAppointment && (
-          <AddAppointment
+      {visibleAppointment && (
+        <AddAppointment
           section={"Create Appointment"}
           api={api}
           show={visibleAppointment}
@@ -1077,9 +1083,8 @@ function Index() {
           }}
           data={selected}
           refresh={() => setRefresh((prev) => !prev)}
-          />
-        )
-      }
+        />
+      )}
 
       {visible && (
         <AddFrom
