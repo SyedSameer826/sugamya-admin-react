@@ -1,8 +1,8 @@
 import { Col, Form, Image, Input, InputNumber, Modal, Radio, Row, Select } from "antd";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 
-import notfound from "../../assets/images/not_found.png";
-import SingleImageUpload from "../../components/SingleImageUpload";
+// import notfound from "../../assets/images/not_found.png";
+// import SingleImageUpload from "../../components/SingleImageUpload";
 import { Severty, ShowToast } from "../../helper/toast";
 import useRequest from "../../hooks/useRequest";
 const { Option } = Select;
@@ -14,7 +14,7 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   const [file, setFile] = useState([]);
   const [image, setImage] = useState();
   const [loading, setLoading] = useState(false);
-  const [country, setCountry] = useState([]);
+  // const [country, setCountry] = useState([]);
 
   const FileType = [
     "image/png",

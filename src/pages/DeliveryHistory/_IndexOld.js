@@ -14,19 +14,19 @@ import {
   Radio,
   Image,
 } from "antd";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import useRequest from "../../hooks/useRequest";
 import { ShowToast, Severty } from "../../helper/toast";
 import useDebounce from "../../hooks/useDebounce";
 import { useNavigate } from "react-router";
 import apiPath from "../../constants/apiPath";
-import { PRICE } from "../../constants/conts";
+// import { PRICE } from "../../constants/conts";
 import moment from "moment";
-import { DownloadExcel, SampleFileDownload } from "../../components/ExcelFile";
+// import { DownloadExcel, SampleFileDownload } from "../../components/ExcelFile";
 import SingleImageUpload from "../../components/SingleImageUpload";
 
 import notfound from "../../assets/images/not_found.png";
-import Plus from "../../assets/images/plus.svg";
+// import Plus from "../../assets/images/plus.svg";
 import DeleteIcon from "../../assets/images/delete.svg";
 import { AppStateContext } from "../../context/AppContext";
 const Search = Input.Search;
@@ -184,7 +184,7 @@ function Index() {
       key: "Item_Description",
     },
     {
-      title: "Action", 
+      title: "Action",
       render: (_, record) => {
         return (
           <>

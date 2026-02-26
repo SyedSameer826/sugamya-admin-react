@@ -32,7 +32,7 @@ import * as success from "../../../assets/animation/success.json";
 import ConfirmationBox from "../../../components/ConfirmationBox";
 import { useNavigate, useLocation } from "react-router";
 import SingleImageUpload from "../../../components/SingleImageUpload";
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 const DeleteSubadminReasons = [
   "Violation of Platform Policies",
   "Fraudulent Activity",

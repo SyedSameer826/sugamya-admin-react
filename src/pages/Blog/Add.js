@@ -6,8 +6,8 @@ import { useNavigate } from "react-router";
 import apiPath from "../../constants/apiPath";
 import DescriptionEditor from "../../components/DescriptionEditor";
 import SingleImageUpload from "../../components/SingleImageUpload";
-import notfound from "../../assets/images/not_found.png";
-import { shortLang, longLang } from "../../config/language";
+// import notfound from "../../assets/images/not_found.png";
+// import { shortLang, longLang } from "../../config/language";
 import { Link } from "react-router-dom";
 
 function Add() {
@@ -67,8 +67,11 @@ function Add() {
     // payload.de_description = editorDeValue;
     // payload.es_description = editorEsValue;
     // payload.fr_description = editorFrValue;
-    if(image && image.length > 0 ){ payload.thumbnail = image[0].url} 
-    else{return ShowToast("Image is not uploaded", Severty.ERROR);}
+    if (image && image.length > 0) {
+      payload.thumbnail = image[0].url;
+    } else {
+      return ShowToast("Image is not uploaded", Severty.ERROR);
+    }
     setLoading(true);
     request({
       url: apiPath.addEditBlog,
@@ -145,18 +148,12 @@ function Add() {
                 ]}
                 normalize={(value) => value.trimStart()}
               >
-                <Input
-                  autoComplete="off"
-                  placeholder={`Enter Title`}
-                />
+                <Input autoComplete="off" placeholder={`Enter Title`} />
               </Form.Item>
             </Col>
 
             <Col span={24}>
-              <Form.Item
-                label={`Description`}
-                name="description"
-              >
+              <Form.Item label={`Description`} name="description">
                 <DescriptionEditor
                   value={editorValue}
                   placeholder={`Enter Description`}
@@ -164,14 +161,13 @@ function Add() {
                 />
               </Form.Item>
             </Col>
-        
           </Row>
 
           <Form.Item className="btn-row float-right mb-0">
             <Link
               className="ant-btn ant-btn-primary"
               type="primary"
-              to = "/blogs?key=1"
+              to="/blogs?key=1"
               // to={`/${route1ame}`}
             >
               Back

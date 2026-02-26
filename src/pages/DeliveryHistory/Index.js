@@ -17,22 +17,22 @@ import {
 } from "antd";
 import Currency from "../../components/Currency";
 import { UndoOutlined } from "@ant-design/icons";
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import useRequest from "../../hooks/useRequest";
 import { ShowToast, Severty } from "../../helper/toast";
 import { Last20Years, Months } from "../../constants/var";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import apiPath from "../../constants/apiPath";
-import { PRICE } from "../../constants/conts";
+// import { PRICE } from "../../constants/conts";
 import moment from "moment";
-import { DownloadExcel, SampleFileDownload } from "../../components/ExcelFile";
-import SingleImageUpload from "../../components/SingleImageUpload";
+// import { DownloadExcel, SampleFileDownload } from "../../components/ExcelFile";
+// import SingleImageUpload from "../../components/SingleImageUpload";
 
 import notfound from "../../assets/images/not_found.png";
-import Plus from "../../assets/images/plus.svg";
+// import Plus from "../../assets/images/plus.svg";
 import { AppStateContext } from "../../context/AppContext";
-import DriverImg from "../../assets/images/face-6.jpeg";
-const Search = Input.Search;
+// import DriverImg from "../../assets/images/face-6.jpeg";
+// const Search = Input.Search;
 const { TabPane } = Tabs;
 
 export const QuoteStatus = {
@@ -45,26 +45,25 @@ export const QuoteStatus = {
 };
 
 function Index() {
-
-  const routeName = "delivery";
+  // const routeName = "delivery";
 
   const api = {
     status: apiPath.statusQuote,
     list: apiPath.history,
   };
-  const [visible, setVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  // const [visible, setVisible] = useState(false);
+  // const [searchText, setSearchText] = useState("");
   const { request } = useRequest();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [refresh, setRefresh] = useState(false);
+  // const [refresh, setRefresh] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
   //For Filters
-  const [filter, setFilter] = useState();
+  // const [filter, setFilter] = useState();
 
   const [selectedTab, setSelectedTab] = useState("all");
 
@@ -99,8 +98,6 @@ function Index() {
       },
     });
   };
-
-
 
   return (
     <>
