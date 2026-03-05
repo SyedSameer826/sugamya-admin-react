@@ -21,6 +21,7 @@ const AddReviewRatingForm = ({
   const [rating, setRating] = useState(0);
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [nameInput, setNameInput] = useState(""); // <-- New state for Name input
 
   // ================= FETCH APPOINTMENTS =================
   useEffect(() => {
@@ -36,6 +37,27 @@ const AddReviewRatingForm = ({
       },
     });
   }, [show]);
+
+  // ================= HANDLE NAME CHANGE =================
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setNameInput(value);
+
+    // If a name is typed, reset appointment selection
+    if (value) {
+      setSelectedAppointment(null);
+      form.resetFields([
+        "user_name",
+        "email",
+        "patient_name",
+        "uhid",
+        "appointment_id",
+        "appointment_date",
+        "appointment_time",
+        "appointment_type",
+      ]);
+    }
+  };
 
   // ================= HANDLE APPOINTMENT CHANGE =================
   const handleAppointmentChange = (id) => {
@@ -95,6 +117,7 @@ const AddReviewRatingForm = ({
       rating,
       review: values.review,
       is_active: values.is_active,
+      name: values.name || undefined,
     };
 
     // Include appointment-related fields only if selected
@@ -117,6 +140,7 @@ const AddReviewRatingForm = ({
           form.resetFields();
           setRating(0);
           setSelectedAppointment(null);
+          setNameInput(""); // Reset name input
         } else {
           ShowToast(res.message, Severty.ERROR);
         }
@@ -139,7 +163,7 @@ const AddReviewRatingForm = ({
           display: "flex",
           justifyContent: "flex-start",
           alignItems: "center",
-          gap: 4, // spacing between stars
+          gap: 4,
         }}
       >
         {Array.from({ length: 5 }, (_, index) => {
@@ -178,26 +202,49 @@ const AddReviewRatingForm = ({
       centered
     >
       <Form id="reviewForm" form={form} layout="vertical" onFinish={onSubmit}>
+        {/* ================= NAME INPUT ================= */}
+        {!selectedAppointment && (
+          <>
+            <Divider orientation="left">Reviewer Info</Divider>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item label="Name" name="name">
+                  <Input
+                    placeholder="Enter name..."
+                    value={nameInput}
+                    onChange={handleNameChange}
+                    disabled={readOnly}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
+
         {/* ================= APPOINTMENT SELECT (OPTIONAL) ================= */}
-        <Divider orientation="left">Select Appointment</Divider>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Appointment">
-              <Select
-                allowClear
-                placeholder="Select appointment (optional)"
-                onChange={handleAppointmentChange}
-                value={selectedAppointment?._id}
-              >
-                {appointments.map((appt) => (
-                  <Option key={appt._id} value={appt._id}>
-                    {appt.appointment_id}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+        {!nameInput && (
+          <>
+            <Divider orientation="left">Select Appointment</Divider>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item label="Appointment">
+                  <Select
+                    allowClear
+                    placeholder="Select appointment (optional)"
+                    onChange={handleAppointmentChange}
+                    value={selectedAppointment?._id}
+                  >
+                    {appointments.map((appt) => (
+                      <Option key={appt._id} value={appt._id}>
+                        {appt.appointment_id}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
         {/* ================= USER INFO (VISIBLE ONLY IF APPOINTMENT SELECTED) ================= */}
         {selectedAppointment && (

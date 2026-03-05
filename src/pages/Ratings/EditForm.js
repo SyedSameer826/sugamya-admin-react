@@ -12,16 +12,17 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
   const { request } = useRequest();
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
-
+  const [nameInput, setNameInput] = useState(""); // <-- New state for Name input
   // Populate form with data
   useEffect(() => {
     if (!data) return;
 
     form.setFieldsValue({
       review: data?.review || "",
+      name: data?.name || "",
       is_active: data?.is_active ?? true,
     });
-
+    setNameInput(data?.name || "");
     setRating(Number(data?.rating) || 0);
   }, [data, form]);
 
@@ -31,6 +32,7 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
     setLoading(true);
 
     const payload = {
+      name: values.name || undefined,
       rating,
       review: values.review,
       is_active: values.is_active,
@@ -182,6 +184,18 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
         {/* REVIEW SECTION */}
         <Divider orientation="left">Review & Rating</Divider>
         <Row gutter={16}>
+          {nameInput && (
+            <Col span={24}>
+              <Form.Item label="Name" name="name">
+                <Input
+                  placeholder="Enter name..."
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  disabled={readOnly}
+                />
+              </Form.Item>
+            </Col>
+          )}
           <Col span={24}>
             <Form.Item label="Rating" required>
               {renderStars()}

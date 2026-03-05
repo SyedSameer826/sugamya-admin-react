@@ -119,7 +119,7 @@ function DoctorAppointments() {
           pagination={pagination}
           onChange={handleTableChange}
           rowClassName={(record) => {
-            return record?.availability_id?.is_deleted ? "deleted-row" : "";
+            return record?.status == "Booked" ? "deleted-row" : "";
           }}
         />
       </SectionWrapper>

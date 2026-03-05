@@ -28,7 +28,7 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
   const [slotsList, setSlotsList] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [priceReadOnly, setPriceReadOnly] = useState(false);
-
+  const [selectedPatient, setSelectedPatient] = useState(null);
   // -------------------- GET PATIENTS --------------------
   const getPatientList = () => {
     request({
@@ -140,6 +140,7 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
         appointment_category: "NA",
         slotId: values.slotId,
         preferredTime: null,
+        user_id: selectedPatient?.added_by,
       };
 
       // Submit appointment
@@ -249,7 +250,11 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
               <Select
                 placeholder="Select Patient"
                 showSearch
-                onChange={(value) => getCalculatedAmount(value)}
+                onChange={(value) => {
+                  const patient = patientList.find((p) => p._id === value);
+                  setSelectedPatient(patient);
+                  getCalculatedAmount(value);
+                }}
               >
                 {patientList.map((patient) => (
                   <Option key={patient._id} value={patient._id}>
