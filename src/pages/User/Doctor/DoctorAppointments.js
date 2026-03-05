@@ -118,6 +118,9 @@ function DoctorAppointments() {
           dataSource={list}
           pagination={pagination}
           onChange={handleTableChange}
+          rowClassName={(record) => {
+            return record?.availability_id?.is_deleted ? "deleted-row" : "";
+          }}
         />
       </SectionWrapper>
     </div>

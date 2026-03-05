@@ -26,7 +26,7 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
   }, [data, form]);
 
   const onSubmit = (values) => {
-    if (readOnly) return; // prevent submitting in read-only mode
+    if (readOnly) return;
 
     setLoading(true);
 
@@ -60,7 +60,13 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
     });
   };
 
-  // Helper to render stars
+  // Check if sections have data
+  const hasUserInfo = data?.user_id?.name || data?.user_id?.email;
+  const hasPatientInfo = data?.patient_id?.name || data?.patient_id?.uhid;
+  const hasAppointmentInfo =
+    data?.appointments?.appointment_id || data?.appointments?.appointment_date;
+
+  // Render stars
   const renderStars = () => {
     return (
       <div
@@ -107,66 +113,78 @@ const ReviewForm = ({ api, show, hide, data, refresh, readOnly = false }) => {
       centered
     >
       <Form id="reviewForm" form={form} layout="vertical" onFinish={onSubmit}>
-        {/* ========== USER INFO ========== */}
-        <Divider orientation="left">User Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="User Name">
-              <Input value={data?.user_id?.name} disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Email">
-              <Input value={data?.user_id?.email} disabled />
-            </Form.Item>
-          </Col>
-        </Row>
+        {/* USER INFO */}
+        {hasUserInfo && (
+          <>
+            <Divider orientation="left">User Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="User Name">
+                  <Input value={data?.user_id?.name} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Email">
+                  <Input value={data?.user_id?.email} disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
-        {/* ========== PATIENT INFO ========== */}
-        <Divider orientation="left">Patient Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Patient Name">
-              <Input value={data?.patient_id?.name} disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="UHID">
-              <Input value={data?.patient_id?.uhid} disabled />
-            </Form.Item>
-          </Col>
-        </Row>
+        {/* PATIENT INFO */}
+        {hasPatientInfo && (
+          <>
+            <Divider orientation="left">Patient Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Patient Name">
+                  <Input value={data?.patient_id?.name} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="UHID">
+                  <Input value={data?.patient_id?.uhid} disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
-        {/* ========== APPOINTMENT INFO ========== */}
-        <Divider orientation="left">Appointment Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Appointment ID">
-              <Input value={data?.appointments?.appointment_id} disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Date">
-              <Input
-                value={
-                  data?.appointments?.appointment_date
-                    ? moment(data.appointments.appointment_date).format(
-                        "DD-MM-YYYY",
-                      )
-                    : ""
-                }
-                disabled
-              />
-            </Form.Item>
-          </Col>
-        </Row>
+        {/* APPOINTMENT INFO */}
+        {hasAppointmentInfo && (
+          <>
+            <Divider orientation="left">Appointment Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Appointment ID">
+                  <Input value={data?.appointments?.appointment_id} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Date">
+                  <Input
+                    value={
+                      data?.appointments?.appointment_date
+                        ? moment(data.appointments.appointment_date).format(
+                            "DD-MM-YYYY",
+                          )
+                        : ""
+                    }
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
-        {/* ========== REVIEW & RATING ========== */}
+        {/* REVIEW SECTION */}
         <Divider orientation="left">Review & Rating</Divider>
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item label="Rating" required>
-              <div>{renderStars()}</div>
+              {renderStars()}
             </Form.Item>
           </Col>
 

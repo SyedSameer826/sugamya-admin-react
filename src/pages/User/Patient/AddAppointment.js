@@ -1,11 +1,21 @@
-import { Col, DatePicker, Form, Input, Modal, Row, Select, Image, message  } from "antd";
+import {
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Image,
+  message,
+} from "antd";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import "react-phone-input-2/lib/style.css";
 import { Severty, ShowToast } from "../../../helper/toast";
 import useRequest from "../../../hooks/useRequest";
 import apiPath from "../../../constants/apiPath";
-import { TimePicker } from 'antd';
+import { TimePicker } from "antd";
 const { Option } = Select;
 
 const AddAppointment = ({ section, api, show, hide, data, refresh }) => {
@@ -25,31 +35,23 @@ const AddAppointment = ({ section, api, show, hide, data, refresh }) => {
     });
   };
 
-
   const onCreate = (values) => {
-    const {
-     appointment_id,
-     preferred_time,
-     doctor_id
-    } = values;
+    const { appointment_id, preferred_time, doctor_id } = values;
     const payload = {
-        appointmentId: appointment_id,
-        preferedTime: preferred_time,
-        assigned_doctor: doctor_id
+      appointmentId: appointment_id,
+      preferedTime: preferred_time.format("HH:mm A"),
+      assigned_doctor: doctor_id,
     };
     setLoading(true);
-    
+
     request({
-      url: `${ api.addAppointment + "/" + data?._id }`,
-      method: "PUT" ,
+      url: `${api.addAppointment + "/dada" + data?._id}`,
+      method: "PUT",
       data: payload,
       onSuccess: (data) => {
         setLoading(false);
         if (data.status) {
-          ShowToast(
-           data.message,
-            Severty.SUCCESS
-          );
+          ShowToast(data.message, Severty.SUCCESS);
           hide();
           refresh();
         } else {
@@ -64,9 +66,8 @@ const AddAppointment = ({ section, api, show, hide, data, refresh }) => {
   };
 
   useEffect(() => {
-    getDoctorList()
-  }, [])
-
+    getDoctorList();
+  }, []);
 
   const now = moment();
   const currentHour = now.hour();
@@ -117,92 +118,95 @@ const AddAppointment = ({ section, api, show, hide, data, refresh }) => {
           <h4 className="modal_title_cls">{"Create Appointment"}</h4>
         </div>
         <Row gutter={[24, 0]}>
-        <Col span={24} lg={12} sm={12} className="mt-2">
-  <Form.Item
-    label="Appointment ID"
-    name="appointment_id"
-    rules={[
-      { required: true, message: "Please enter appointment ID!" },
-      {
-        pattern: /^[a-zA-Z0-9_-]+$/,
-        message: "Appointment ID can only contain letters, numbers, hyphens and underscores!",
-      },
-    ]}
-  >
-    <Input placeholder="Enter Appointment ID" autoComplete="off" />
-  </Form.Item>
-</Col>
-
-<Col span={24} lg={12} sm={12} className="mt-2">
-  <Form.Item
-    label="Preferred Time"
-    name="preferred_time"
-    rules={[{ required: true, message: "Please select preferred time!" }]}
-  >
-   <TimePicker
-      use12Hours
-      format="h:mm A"
-      placeholder="Select Time"
-      style={{ width: "100%" }}
-      value={selectedTime}
-      onChange={setSelectedTime}
-       onSelect={(time) => {
-          if (!time) return;
-          const selectedHour = time.hour();
-          const selectedMinute = time.minute();
-      
-          // Fix: Ensure a valid selection is made when switching to PM
-          if (selectedHour === 12 && selectedMinute === 0) {
-            const nextTime = moment().add(1, "hour").startOf("hour");
-            console.log("Fixing Default PM Selection:", nextTime.format("h:mm a"));
-          }
-        }}
-
-        disabledTime={() => {
-            const todayName = moment().format("dddd");
-            const currentHour = moment().hour();
-            const currentMinute = moment().minute();
-        
-              return {
-                disabledHours: () => [...Array(currentHour).keys()], // Disable past hours
-                disabledMinutes: (selectedHour) => {
-                  if (selectedHour === undefined || selectedHour === -1) {
-                    return [...Array(60).keys()]; // Disable all minutes if no hour is selected
-                  }
-                  if (selectedHour === currentHour) {
-                    return [...Array(currentMinute + 1).keys()]; // Disable past minutes
-                  }
-                  return [];
+          <Col span={24} lg={12} sm={12} className="mt-2">
+            <Form.Item
+              label="Appointment ID"
+              name="appointment_id"
+              rules={[
+                { required: true, message: "Please enter appointment ID!" },
+                {
+                  pattern: /^[a-zA-Z0-9_-]+$/,
+                  message:
+                    "Appointment ID can only contain letters, numbers, hyphens and underscores!",
                 },
-              };
-           
-          }}
-    />
-  </Form.Item>
-</Col>
+              ]}
+            >
+              <Input placeholder="Enter Appointment ID" autoComplete="off" />
+            </Form.Item>
+          </Col>
 
-<Col span={24} lg={12} sm={12} className="mt-2">
-  <Form.Item
-    label="Doctor"
-    name="doctor_id"
-    rules={[{ required: true, message: "Please select a doctor!" }]}
-  >
-    <Select
-      showSearch
-      placeholder="Select Doctor"
-      filterOption={(input, option) =>
-        option.children.toLowerCase().includes(input.toLowerCase())
-      }
-    >
-      {doctors?.map((doc) => (
-        <Option key={doc._id} value={doc._id}>
-          {doc.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-</Col>
+          <Col span={24} lg={12} sm={12} className="mt-2">
+            <Form.Item
+              label="Preferred Time"
+              name="preferred_time"
+              rules={[
+                { required: true, message: "Please select preferred time!" },
+              ]}
+            >
+              <TimePicker
+                use12Hours
+                format="h:mm A"
+                placeholder="Select Time"
+                style={{ width: "100%" }}
+                value={selectedTime}
+                onChange={setSelectedTime}
+                onSelect={(time) => {
+                  if (!time) return;
+                  const selectedHour = time.hour();
+                  const selectedMinute = time.minute();
 
+                  // Fix: Ensure a valid selection is made when switching to PM
+                  if (selectedHour === 12 && selectedMinute === 0) {
+                    const nextTime = moment().add(1, "hour").startOf("hour");
+                    console.log(
+                      "Fixing Default PM Selection:",
+                      nextTime.format("h:mm a"),
+                    );
+                  }
+                }}
+                disabledTime={() => {
+                  const todayName = moment().format("dddd");
+                  const currentHour = moment().hour();
+                  const currentMinute = moment().minute();
+
+                  return {
+                    disabledHours: () => [...Array(currentHour).keys()], // Disable past hours
+                    disabledMinutes: (selectedHour) => {
+                      if (selectedHour === undefined || selectedHour === -1) {
+                        return [...Array(60).keys()]; // Disable all minutes if no hour is selected
+                      }
+                      if (selectedHour === currentHour) {
+                        return [...Array(currentMinute + 1).keys()]; // Disable past minutes
+                      }
+                      return [];
+                    },
+                  };
+                }}
+              />
+            </Form.Item>
+          </Col>
+
+          <Col span={24} lg={12} sm={12} className="mt-2">
+            <Form.Item
+              label="Doctor"
+              name="doctor_id"
+              rules={[{ required: true, message: "Please select a doctor!" }]}
+            >
+              <Select
+                showSearch
+                placeholder="Select Doctor"
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {doctors?.map((doc) => (
+                  <Option key={doc._id} value={doc._id}>
+                    {doc.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
         </Row>
       </Form>
     </Modal>

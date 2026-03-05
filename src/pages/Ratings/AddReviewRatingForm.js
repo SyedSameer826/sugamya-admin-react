@@ -24,8 +24,10 @@ const AddReviewRatingForm = ({
 
   // ================= FETCH APPOINTMENTS =================
   useEffect(() => {
+    if (!show) return;
+
     request({
-      url: api.appointment + `/list`, // Assuming this endpoint returns appointments
+      url: api.appointment + `/list`,
       method: "GET",
       onSuccess: (res) => {
         if (res.status) {
@@ -37,20 +39,32 @@ const AddReviewRatingForm = ({
 
   // ================= HANDLE APPOINTMENT CHANGE =================
   const handleAppointmentChange = (id) => {
+    if (!id) {
+      setSelectedAppointment(null);
+
+      form.resetFields([
+        "user_name",
+        "email",
+        "patient_name",
+        "uhid",
+        "appointment_id",
+        "appointment_date",
+        "appointment_time",
+        "appointment_type",
+      ]);
+
+      return;
+    }
+
     const appt = appointments.find((a) => a._id === id);
     setSelectedAppointment(appt);
 
     if (appt) {
       form.setFieldsValue({
-        // User Info
         user_name: appt.user?.name || "",
         email: appt.user?.email || "",
-
-        // Patient Info
         patient_name: appt.patient_details?.name || "",
         uhid: appt.patient_details?.uhid || "",
-
-        // Appointment Info
         appointment_id: appt.appointment_id || "",
         appointment_date: appt.appointment_date
           ? moment(appt.appointment_date).format("DD-MM-YYYY")
@@ -60,7 +74,6 @@ const AddReviewRatingForm = ({
       });
     }
 
-    // Reset rating & review when appointment changes
     setRating(0);
     form.setFieldsValue({
       review: "",
@@ -70,26 +83,26 @@ const AddReviewRatingForm = ({
 
   // ================= SUBMIT =================
   const onSubmit = (values) => {
-    if (!selectedAppointment) {
-      ShowToast("Please select an appointment", Severty.ERROR);
-      return;
-    }
-
     if (!rating) {
       ShowToast("Please select rating", Severty.ERROR);
       return;
     }
 
     setLoading(true);
+
     const payload = {
-      appointment_id: selectedAppointment._id,
-      user_id: selectedAppointment.user?._id,
-      patient_id: selectedAppointment.patient_details?._id,
       type: "review",
       rating,
       review: values.review,
       is_active: values.is_active,
     };
+
+    // Include appointment-related fields only if selected
+    if (selectedAppointment) {
+      payload.appointment_id = selectedAppointment._id;
+      payload.user_id = selectedAppointment.user?._id;
+      payload.patient_id = selectedAppointment.patient_details?._id;
+    }
 
     request({
       url: api.addReview,
@@ -165,25 +178,20 @@ const AddReviewRatingForm = ({
       centered
     >
       <Form id="reviewForm" form={form} layout="vertical" onFinish={onSubmit}>
-        {/* ================= APPOINTMENT SELECT ================= */}
+        {/* ================= APPOINTMENT SELECT (OPTIONAL) ================= */}
         <Divider orientation="left">Select Appointment</Divider>
         <Row gutter={16}>
           <Col span={24}>
-            <Form.Item
-              label="Appointment"
-              required
-              rules={[{ required: true, message: "Select appointment" }]}
-            >
+            <Form.Item label="Appointment">
               <Select
-                placeholder="Select appointment"
+                allowClear
+                placeholder="Select appointment (optional)"
                 onChange={handleAppointmentChange}
                 value={selectedAppointment?._id}
               >
                 {appointments.map((appt) => (
                   <Option key={appt._id} value={appt._id}>
                     {appt.appointment_id}
-                    {/* -{" "}
-                    {moment(appt.appointment_date).format("DD-MM-YYYY")} */}
                   </Option>
                 ))}
               </Select>
@@ -191,63 +199,67 @@ const AddReviewRatingForm = ({
           </Col>
         </Row>
 
-        {/* ================= USER INFO ================= */}
-        <Divider orientation="left">User Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="User Name" name="user_name">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Email" name="email">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-        </Row>
+        {/* ================= USER INFO (VISIBLE ONLY IF APPOINTMENT SELECTED) ================= */}
+        {selectedAppointment && (
+          <>
+            <Divider orientation="left">User Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="User Name" name="user_name">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Email" name="email">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* ================= PATIENT INFO ================= */}
-        <Divider orientation="left">Patient Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Patient Name" name="patient_name">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="UHID" name="uhid">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-        </Row>
+            {/* ================= PATIENT INFO ================= */}
+            <Divider orientation="left">Patient Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Patient Name" name="patient_name">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="UHID" name="uhid">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+            </Row>
 
-        {/* ================= APPOINTMENT INFO ================= */}
-        <Divider orientation="left">Appointment Info</Divider>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Appointment ID" name="appointment_id">
-              <Input disabled />
-            </Form.Item>
-          </Col>
+            {/* ================= APPOINTMENT INFO ================= */}
+            <Divider orientation="left">Appointment Info</Divider>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Appointment ID" name="appointment_id">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item label="Date" name="appointment_date">
-              <Input disabled />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <Form.Item label="Date" name="appointment_date">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item label="Time" name="appointment_time">
-              <Input disabled />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <Form.Item label="Time" name="appointment_time">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item label="Type" name="appointment_type">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-        </Row>
+              <Col span={12}>
+                <Form.Item label="Type" name="appointment_type">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+          </>
+        )}
 
         {/* ================= REVIEW & RATING ================= */}
         <Divider orientation="left">Review & Rating</Divider>

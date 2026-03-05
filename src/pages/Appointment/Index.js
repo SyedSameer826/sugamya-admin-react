@@ -689,7 +689,7 @@ function Index() {
 
         return (
           <>
-            {record?.appointment_status != "pending" && (
+            {/* {record?.appointment_status != "pending" && ( */}
               <Tooltip title={"Edit"} color={"purple"} key={"edit"}>
                 <Button
                   className="edit-cls btnStyle primary_btn"
@@ -701,7 +701,7 @@ function Index() {
                   <i class="fas fa-edit"></i>
                 </Button>
               </Tooltip>
-            )}
+            {/* )} */}
 
             {record?.appointment_status === "pending" &&
               record?.status === "NA" &&
