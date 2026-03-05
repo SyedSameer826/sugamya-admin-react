@@ -5,12 +5,14 @@ import apiPath from "../../../constants/apiPath";
 import moment from "moment";
 import SectionWrapper from "../../../components/SectionWrapper";
 import lang from "../../../helper/langHelper";
+
 function DoctorAppointments() {
   const { request } = useRequest();
 
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(moment()); // default today
+  const [selectedDate, setSelectedDate] = useState(moment());
+  const [doctorFilter, setDoctorFilter] = useState(null);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -45,13 +47,27 @@ function DoctorAppointments() {
     });
   };
 
-  const handleTableChange = (pager) => {
+  const handleTableChange = (pager, filters) => {
+    setDoctorFilter(filters?.doctorName || null);
     fetchAppointments(pager.current, pager.pageSize, selectedDate);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
+    setDoctorFilter(null); // reset doctor filter
   };
+
+  const doctorFilters = [
+    ...new Map(
+      list.map((item) => [
+        item?.doctor_id?._id,
+        {
+          text: item?.doctor_id?.name,
+          value: item?.doctor_id?.name,
+        },
+      ]),
+    ).values(),
+  ];
 
   const columns = [
     {
@@ -62,7 +78,13 @@ function DoctorAppointments() {
     },
     {
       title: "Doctor Name",
-      render: (record) => record?.doctor_id?.name || "-",
+      dataIndex: ["doctor_id", "name"],
+      key: "doctorName",
+      filters: doctorFilters,
+      filteredValue: doctorFilter,
+      onFilter: (value, record) =>
+        record?.doctor_id?.name?.toLowerCase().includes(value.toLowerCase()),
+      render: (_, record) => record?.doctor_id?.name || "-",
     },
     {
       title: "Slot Date",
@@ -87,28 +109,25 @@ function DoctorAppointments() {
 
   return (
     <div className="table-responsive">
-      {/* Date Filter */}
       <SectionWrapper
         cardHeading={lang("Doctors") + " " + lang(" Appointments")}
         extra={
-          <>
-            <div className="w-100 d-grid align-items-baseline text-head_right_cont">
-              <div className="pageHeadingSearch pageHeadingbig d-flex gap-2">
-                <div className="role-wrap">
-                  <Row style={{ marginBottom: 16 }}>
-                    <Col>
-                      <DatePicker
-                        value={selectedDate}
-                        onChange={handleDateChange}
-                        format="DD-MM-YYYY"
-                        allowClear={false}
-                      />
-                    </Col>
-                  </Row>
-                </div>
+          <div className="w-100 d-grid align-items-baseline text-head_right_cont">
+            <div className="pageHeadingSearch pageHeadingbig d-flex gap-2">
+              <div className="role-wrap">
+                <Row style={{ marginBottom: 16 }}>
+                  <Col>
+                    <DatePicker
+                      value={selectedDate}
+                      onChange={handleDateChange}
+                      format="DD-MM-YYYY"
+                      allowClear={false}
+                    />
+                  </Col>
+                </Row>
               </div>
             </div>
-          </>
+          </div>
         }
       >
         <Table
@@ -118,9 +137,9 @@ function DoctorAppointments() {
           dataSource={list}
           pagination={pagination}
           onChange={handleTableChange}
-          rowClassName={(record) => {
-            return record?.status == "Booked" ? "deleted-row" : "";
-          }}
+          rowClassName={(record) =>
+            record?.status === "Booked" ? "deleted-row" : ""
+          }
         />
       </SectionWrapper>
     </div>
