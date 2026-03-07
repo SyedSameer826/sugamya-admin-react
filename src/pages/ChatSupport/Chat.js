@@ -193,6 +193,7 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
                     <h3 className="small text-muted">
                       {group?.last_message?.message}
                     </h3>
+                    {/*Testing*/}
                     {/* <p> */}
                     {/* {unReadCount > 0 && (
                         <span className="unread-count">{unReadCount}</span>
