@@ -67,11 +67,25 @@ const UpdateScheduledAppointmentForm = ({ show, hide, data, refresh }) => {
       "and doctor_id:",
       form.getFieldValue("doctor_id"),
       form.getFieldValue("doctor_id")?.value,
+      moment(selectedDate).format("YYYY-MM-DD"),
+      moment(selectedDate).isValid(),
     );
-    if (!selectedDate || !form.getFieldValue("doctor_id")?.value) return;
+    if (!selectedDate) return;
+    let formattedDate = selectedDate;
+    if (!moment(formattedDate).isValid()) {
+      formattedDate = moment(selectedDate, [
+        "DD-MM-YYYYTHH:mm:ss.SSSZ",
+        "DD-MM-YYYY[T]HH:mm:ss.SSS[Z]",
+        "DD-MM-YYYY",
+      ]);
+    }
 
+    let url = `${apiPath.slots}/${moment(formattedDate).format("YYYY-MM-DD")}`;
+    if (form.getFieldValue("doctor_id")?.value) {
+      url += `?doctor_id=${form.getFieldValue("doctor_id").value}`;
+    }
     request({
-      url: `${apiPath.slots}/${selectedDate}?doctor_id=${form.getFieldValue("doctor_id")?.value}`,
+      url: url,
       method: "GET",
       onSuccess: (res) => {
         setSlotsList(res?.data || []);
@@ -154,14 +168,15 @@ const UpdateScheduledAppointmentForm = ({ show, hide, data, refresh }) => {
 
         <Row gutter={[16, 0]}>
           {/* DOCTOR SELECT */}
-          <Col span={24}>
-            <Form.Item
-              label="Select Doctor"
-              rules={[{ required: true, message: "Please select a doctor!" }]}
-            >
-              <Input value={data?.doctor?.name} disabled />
-            </Form.Item>
-            {/* <Form.Item
+          {data?.doctor && (
+            <Col span={24}>
+              <Form.Item
+                label="Select Doctor"
+                rules={[{ required: true, message: "Please select a doctor!" }]}
+              >
+                <Input value={data?.doctor?.name} disabled />
+              </Form.Item>
+              {/* <Form.Item
               label="Select Doctor"
               name="doctor_id"
               rules={[{ required: true, message: "Please select a doctor!" }]}
@@ -187,7 +202,8 @@ const UpdateScheduledAppointmentForm = ({ show, hide, data, refresh }) => {
                 })}
               </Select>
             </Form.Item> */}
-          </Col>
+            </Col>
+          )}
 
           {/* DATE */}
           <Col span={24}>
