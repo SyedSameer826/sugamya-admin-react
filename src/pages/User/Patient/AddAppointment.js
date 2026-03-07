@@ -45,7 +45,7 @@ const AddAppointment = ({ section, api, show, hide, data, refresh }) => {
     setLoading(true);
 
     request({
-      url: `${api.addAppointment + "/dada" + data?._id}`,
+      url: `${api.addAppointment +"/"+  data?._id}`,
       method: "PUT",
       data: payload,
       onSuccess: (data) => {
