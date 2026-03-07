@@ -19,22 +19,22 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   const [slotTimings, setSlotTimings] = useState();
   const [doctorList, setDoctorList] = useState([]);
   const [selectedDate, setSelectedDate] = useState();
+  const isLabReport = data?.appointment_category === "LabReport";
 
   const onCreate = (values) => {
     console.log(values, "appointment time??????")
-    const localDate = new Date( values.appointment_time);
 
-  // Get the UTC hours and minutes
-  const utcHours = localDate.getUTCHours();
-  const utcMinutes = localDate.getUTCMinutes();
+    let appointmentTime;
+    if (isLabReport) {
+      // For lab report, convert TimePicker moment to UTC HH:mm
+      appointmentTime = moment(values.appointment_time).utc().format("HH:mm");
+    } else {
+      appointmentTime = slotTimings;
+    }
 
-  // Format in HH:mm format
-  const utcTime = `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`;
-  console.log(utcTime, "utc time>>>>>>")
-
-    let payload = { 
+    let payload = {
       ...values,
-      appointment_time: slotTimings
+      appointment_time: appointmentTime
     }
     setLoading(true)
     request({
@@ -59,6 +59,18 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   };
 
   const getDoctorList = () => {
+    if (isLabReport) {
+      // For lab report, fetch all doctors without slot/time filter
+      request({
+        url: apiPath.doctors,
+        method: "GET",
+        onSuccess: (data) => {
+          setDoctorList(data.extras);
+        },
+        onError: (err) => {},
+      });
+      return;
+    }
     if(!selectedDate || !slotTimings) return;
     request({
       url: `${apiPath.doctors}?date=${selectedDate}&time=${slotTimings.split("-")[0]}`,
@@ -72,33 +84,51 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
 
   useEffect(() => {
     if (data) {
-       const timeInLocal = moment.utc(data.appointment_time, "HH:mm").local();
+      if (isLabReport) {
+        // For lab report, set today's date and use TimePicker moment value
+        const todayDate = moment().format("YYYY-MM-DD") + "T00:00:00.000Z";
+        form.setFieldsValue({
+          appointment_date: moment(new Date()),
+          appointment_time: data.appointment_time ? moment.utc(data.appointment_time, "HH:mm").local() : null,
+          doctor_id: data.doctor_id,
+        });
+        setSelectedDate(todayDate);
+      } else {
+        const timeInLocal = moment.utc(data.appointment_time, "HH:mm").local();
 
-      let appointment_time = (timeInLocal).format("hh:mm A");
-      let timePart = data.appointment_time? data?.appointment_time?.split("T")[1]?.split(":"): [];
-      let hours = timePart?.[0];
-      let minutes = timePart?.[1];
-      
-      // Combine hours and minutes in 24-hour format
-      // const formattedTime = `${hours}:${minutes}`;
-      const formattedTime = data.appointment_time;
-      if(data.appointment_time){
+        let appointment_time = (timeInLocal).format("hh:mm A");
+        let timePart = data.appointment_time? data?.appointment_time?.split("T")[1]?.split(":"): [];
+        let hours = timePart?.[0];
+        let minutes = timePart?.[1];
 
-        setSlotTimings(formattedTime);
+        // Combine hours and minutes in 24-hour format
+        // const formattedTime = `${hours}:${minutes}`;
+        const formattedTime = data.appointment_time;
+        if(data.appointment_time){
+
+          setSlotTimings(formattedTime);
+        }
+        form.setFieldsValue({
+          appointment_date: data.appointment_date? moment(data.appointment_date): moment(new Date()), // Assuming data.appointment_date is in a suitable format
+          appointment_time: appointment_time, // Assuming data.appointment_time is already formatted
+          doctor_id: data.doctor_id,
+          // Set other form fields here based on the data object
+        });
+        setSelectedDate(data.appointment_date?data.appointment_date: moment(new Date()));
       }
-      form.setFieldsValue({
-        appointment_date: data.appointment_date? moment(data.appointment_date): moment(new Date()), // Assuming data.appointment_date is in a suitable format
-        appointment_time: appointment_time, // Assuming data.appointment_time is already formatted
-        doctor_id: data.doctor_id,
-        // Set other form fields here based on the data object
-      });
+    } else {
+      setSelectedDate(moment(new Date()));
     }
-    setSelectedDate(data.appointment_date?data.appointment_date: moment(new Date()));
   }, [data]); // Add form dependency to useEffect dependency array
 
   useEffect(() => {
-    handleChange();
-    getDoctorList();
+    if (isLabReport) {
+      // For lab report, only fetch all doctors (no slots needed)
+      getDoctorList();
+    } else {
+      handleChange();
+      getDoctorList();
+    }
   }, [selectedDate, slotTimings]);
 
   const handleChange = () => {
@@ -235,54 +265,47 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
             </Form.Item>
           </Col>
 
-        {/* { data.appointment_category==="LabReport" ? */}
-         <Col>
-            <Form.Item
-              className="qty-cls "
-              label="Enter Time"
-              style={{ minWidth: "180px" }}
-              name="appointment_time"
-            >
-              <Select onChange={handleTime} placeholder="Select Time" >
-                {/* Iterate over unique time slots in the Set */}
-                {[...uniqueSlots].map((slotString) => {
-                  // Split the slotString to get start and end times
-                  const [startTime, endTime] = slotString.split("-");
-                  return (
-                    <Option key={slotString} value={startTime}>
-                      { moment
-                        .utc(startTime, "HH:mm")
-                        .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                        .format("hh:mm A")}
-                      {/* {startTime} */}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          {/* :<Col>
-            <Form.Item
-              className="qty-cls "
-              label="Enter Time"
-              style={{ minWidth: "180px" }}
-              name="appointment_time"
-            >
-              <Select onChange={handleTime} placeholder="Select Time" disabled>
-                {[...uniqueSlots].map((slotString) => {
-                  const [startTime, endTime] = slotString.split("-");
-                  return (
-                    <Option key={slotString} value={startTime}>
-                      { moment
-                        .utc(startTime, "HH:mm")
-                        .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
-                        .format("hh:mm A")}
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>} */}
+          {isLabReport ? (
+            <Col>
+              <Form.Item
+                className="qty-cls "
+                label="Select Time"
+                style={{ minWidth: "180px" }}
+                name="appointment_time"
+                rules={[{ required: true, message: "Please select time!" }]}
+              >
+                <TimePicker
+                  format={format}
+                  use12Hours
+                  placeholder="Select Time"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+          ) : (
+            <Col>
+              <Form.Item
+                className="qty-cls "
+                label="Enter Time"
+                style={{ minWidth: "180px" }}
+                name="appointment_time"
+              >
+                <Select onChange={handleTime} placeholder="Select Time" >
+                  {[...uniqueSlots].map((slotString) => {
+                    const [startTime, endTime] = slotString.split("-");
+                    return (
+                      <Option key={slotString} value={startTime}>
+                        { moment
+                          .utc(startTime, "HH:mm")
+                          .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
+                          .format("hh:mm A")}
+                      </Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+            </Col>
+          )}
           <Col span={24} sm={24}>
             <Form.Item
               label="Select Doctor"
