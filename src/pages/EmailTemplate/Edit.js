@@ -6,7 +6,7 @@ import { ShowToast, Severty } from "../../helper/toast";
 import { useNavigate } from "react-router";
 import apiPath from "../../constants/apiPath";
 import DescriptionEditor from "../../components/DescriptionEditor";
-
+import Editor from "../../components/DescriptionEditorNew";
 function Edit() {
   const sectionName = "Email Template";
   const routeName = "email-template";
@@ -30,6 +30,7 @@ function Edit() {
       onSuccess: (data) => {
         setLoading(false);
         form.setFieldsValue(data.data);
+        console.log("data.data.description........", data.data.description);
         setEditorValue(data.data.description);
       },
       onError: (error) => {
@@ -121,7 +122,7 @@ function Edit() {
               <Col span={24} md={24}>
                 <Form.Item
                   label="Description"
-                  name="description"
+                  // name="description"
                   rules={[
                     {
                       required: true,
@@ -129,7 +130,12 @@ function Edit() {
                     },
                   ]}
                 >
-                  <DescriptionEditor
+                  {/* <DescriptionEditor
+                    value={editorValue}
+                    placeholder="Enter Email Template Description"
+                    onChange={(data) => handleEditorChange(data)}
+                  /> */}
+                  <Editor
                     value={editorValue}
                     placeholder="Enter Email Template Description"
                     onChange={(data) => handleEditorChange(data)}

@@ -177,10 +177,7 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
                 </div>
                 <div className="chat-txxt">
                   <div className="chat_1-maa d-flex justify-content-between">
-                    <h2 className="h5 mb-1">
-                      {group.user?.userName}-
-                      {/* {group.user?.userID?.slice(-4)?.toUpperCase() || ""} */}
-                    </h2>
+                    <h2 className="h5 mb-1">{group.user?.userName}</h2>
                     <p className="text-muted small">
                       {moment(group?.last_message?.time?.toDate()).format(
                         "hh:mm A",
@@ -188,6 +185,7 @@ const Inbox = ({ groups, setSelected, setUser, selected }) => {
                       {console.log("groupgroup---", group)}
                     </p>
                   </div>
+                  <div>{group.user?.uhid || ""}</div>
                   <div
                     className="massage-chat-main "
                     style={{ display: "flex", justifyContent: "space-between" }}
