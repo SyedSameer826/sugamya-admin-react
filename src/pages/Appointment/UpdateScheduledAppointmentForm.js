@@ -79,7 +79,7 @@ const UpdateScheduledAppointmentForm = ({ show, hide, data, refresh }) => {
         "DD-MM-YYYY",
       ]);
     }
-
+    /*done*/
     let url = `${apiPath.slots}/${moment(formattedDate).format("YYYY-MM-DD")}`;
     if (form.getFieldValue("doctor_id")?.value) {
       url += `?doctor_id=${form.getFieldValue("doctor_id").value}`;
