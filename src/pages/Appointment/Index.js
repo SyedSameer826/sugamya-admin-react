@@ -25,7 +25,7 @@ import AddForm from "./AddForm";
 import UpdateScheduledAppointmentForm from "./UpdateScheduledAppointmentForm";
 import AddAppointmentForm from "./AddAppointmentForm";
 import ChangeDoctor from "./ChangeDoctor";
-import { IstConvert } from "../../helper/functions";
+import { IstConvert, unixToLocalDateTime } from "../../helper/functions";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -223,14 +223,17 @@ function Index() {
         );
       },
     },
+
     {
       title: "Scheduled Date",
       key: "date",
       dataIndex: "date",
-      render: (_, { appointment_date }) => {
-        return appointment_date
-          ? moment.parseZone(appointment_date).format("DD-MM-YYYY")
-          : "-";
+      render: (_, { slot_utc, appointment_date }) => {
+        return slot_utc
+          ? unixToLocalDateTime(slot_utc).local().format("DD-MM-YYYY")
+          : appointment_date
+            ? moment.parseZone(appointment_date).format("DD-MM-YYYY")
+            : "-";
       },
 
       sorter: (a, b) =>
@@ -241,13 +244,15 @@ function Index() {
       title: "Scheduled Time",
       key: "appointment_time",
       dataIndex: "appointment_time",
-      render: (_, { appointment_time }) => {
-        if (!appointment_time) {
+      render: (_, { slot_utc, appointment_time }) => {
+        if (!slot_utc && !appointment_time) {
           return <p>-</p>;
         }
 
         // Parse the time in UTC and adjust to local time
-        const timeInLocal = moment.utc(appointment_time, "HH:mm").local();
+        const timeInLocal = slot_utc
+          ? unixToLocalDateTime(slot_utc).local()
+          : moment(appointment_time, "HH:mm").local();
 
         // Format the time in local time zone
         return (
@@ -690,17 +695,17 @@ function Index() {
         return (
           <>
             {/* {record?.appointment_status != "pending" && ( */}
-              <Tooltip title={"Edit"} color={"purple"} key={"edit"}>
-                <Button
-                  className="edit-cls btnStyle primary_btn"
-                  onClick={() => {
-                    setSelected(record);
-                    setUpdateScheduleVisible(true);
-                  }}
-                >
-                  <i class="fas fa-edit"></i>
-                </Button>
-              </Tooltip>
+            <Tooltip title={"Edit"} color={"purple"} key={"edit"}>
+              <Button
+                className="edit-cls btnStyle primary_btn"
+                onClick={() => {
+                  setSelected(record);
+                  setUpdateScheduleVisible(true);
+                }}
+              >
+                <i class="fas fa-edit"></i>
+              </Button>
+            </Tooltip>
             {/* )} */}
 
             {record?.appointment_status === "pending" &&
