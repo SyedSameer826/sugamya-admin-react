@@ -8,6 +8,7 @@ import {
   Input,
   Upload,
   Button,
+  TimePicker,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ import moment from "moment";
 import { Severty, ShowToast } from "../../helper/toast";
 import useRequest from "../../hooks/useRequest";
 import apiPath from "../../constants/apiPath";
-
+const format = "h:mm a";
 const { Option } = Select;
 
 const AddAppointmentForm = ({ show, hide, refresh }) => {
@@ -29,21 +30,31 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
   const [fileList, setFileList] = useState([]);
   const [priceReadOnly, setPriceReadOnly] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patientLoading, setPatientLoading] = useState(false);
   // -------------------- GET PATIENTS --------------------
   const getPatientList = () => {
+    setPatientLoading(true);
+
     request({
       url: apiPath.listPatient + "?page=1&pageSize=50",
       method: "GET",
       onSuccess: (data) => {
         setPatientList(data?.data?.docs || []);
+        setPatientLoading(false);
+      },
+      onError: () => {
+        setPatientLoading(false);
       },
     });
   };
 
   // -------------------- CALCULATE AMOUNT --------------------
-  const getCalculatedAmount = (patientId) => {
+  const getCalculatedAmount = (patientId, reportAwaited = false) => {
     if (!patientId) return;
-
+    if (reportAwaited) {
+      form.setFieldsValue({ price: 0 });
+      return;
+    }
     setPriceReadOnly(true);
     form.setFieldsValue({ price: undefined });
 
@@ -139,7 +150,9 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
         discount_code: values.discount_code || "",
         appointment_category: "NA",
         slotId: values.slotId,
-        preferredTime: null,
+        preferredTime: values?.appointment_time
+          ? moment(values.appointment_time).format("HH:mm")
+          : null,
         user_id: selectedPatient?.added_by,
       };
 
@@ -250,10 +263,22 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
               <Select
                 placeholder="Select Patient"
                 showSearch
+                loading={patientLoading}
+                notFoundContent={
+                  patientLoading ? "Loading patients..." : "No patients"
+                }
                 onChange={(value) => {
                   const patient = patientList.find((p) => p._id === value);
                   setSelectedPatient(patient);
-                  getCalculatedAmount(value);
+
+                  if (
+                    patient?.latest_appointment_status &&
+                    patient.latest_appointment_status == "ReportAwaited"
+                  ) {
+                    getCalculatedAmount(value, true);
+                  } else {
+                    getCalculatedAmount(value);
+                  }
                 }}
               >
                 {patientList.map((patient) => (
@@ -265,53 +290,89 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
               </Select>
             </Form.Item>
           </Col>
+          {selectedPatient?.latest_appointment_status &&
+          selectedPatient.latest_appointment_status == "ReportAwaited" ? (
+            <Col>
+              <Form.Item
+                className="qty-cls "
+                label="Select Time"
+                style={{ minWidth: "180px" }}
+                name="appointment_time"
+                rules={[{ required: true, message: "Please select time!" }]}
+              >
+                <TimePicker
+                  format={format}
+                  use12Hours
+                  placeholder="Select Time"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+          ) : (
+            <>
+              {/* Date */}
+              <Col span={12}>
+                <Form.Item
+                  label="Select Date"
+                  name="appointmentDate"
+                  rules={[{ required: true, message: "Please select date!" }]}
+                >
+                  <DatePicker
+                    format="DD-MM-YYYY"
+                    onChange={handleDateChange}
+                    disabledDate={disabledDate}
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </Col>
 
-          {/* Date */}
-          <Col span={12}>
-            <Form.Item
-              label="Select Date"
-              name="appointmentDate"
-              rules={[{ required: true, message: "Please select date!" }]}
-            >
-              <DatePicker
-                format="DD-MM-YYYY"
-                onChange={handleDateChange}
-                disabledDate={disabledDate}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-          </Col>
+              {/* Slot */}
+              <Col span={12}>
+                <Form.Item
+                  label="Select Slot"
+                  name="slotId"
+                  rules={[{ required: true, message: "Please select a slot!" }]}
+                >
+                  <Select placeholder="Select Slot">
+                    {slotsList.length > 0 ? (
+                      slotsList.map((slot) => (
+                        <Option key={slot._id} value={slot._id}>
+                          {moment
+                            .utc(slot.slot_time_from, "HH:mm")
+                            .local()
+                            .format("hh:mm A")}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option disabled>No slots available</Option>
+                    )}
+                  </Select>
+                </Form.Item>
+              </Col>
 
-          {/* Slot */}
-          <Col span={12}>
-            <Form.Item
-              label="Select Slot"
-              name="slotId"
-              rules={[{ required: true, message: "Please select a slot!" }]}
-            >
-              <Select placeholder="Select Slot">
-                {slotsList.length > 0 ? (
-                  slotsList.map((slot) => (
-                    <Option key={slot._id} value={slot._id}>
-                      {moment
-                        .utc(slot.slot_time_from, "HH:mm")
-                        .local()
-                        .format("hh:mm A")}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No slots available</Option>
-                )}
-              </Select>
-            </Form.Item>
-          </Col>
+              {/* Description */}
+              <Col span={24}>
+                <Form.Item label="Description" name="description">
+                  <Input.TextArea rows={3} />
+                </Form.Item>
+              </Col>
+              {/* Discount Code */}
+              <Col span={12}>
+                <Form.Item label="Discount Code" name="discount_code">
+                  <Input />
+                </Form.Item>
+              </Col>
 
-          {/* Description */}
-          <Col span={24}>
-            <Form.Item label="Description" name="description">
-              <Input.TextArea rows={3} />
-            </Form.Item>
-          </Col>
+              {/* Upload */}
+              <Col span={24}>
+                <Form.Item label="Upload Documents">
+                  <Upload {...uploadProps}>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                  </Upload>
+                </Form.Item>
+              </Col>
+            </>
+          )}
 
           {/* Price */}
           <Col span={12}>
@@ -325,22 +386,6 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
                 readOnly={priceReadOnly}
                 placeholder="Auto calculated price"
               />
-            </Form.Item>
-          </Col>
-
-          {/* Discount Code */}
-          <Col span={12}>
-            <Form.Item label="Discount Code" name="discount_code">
-              <Input />
-            </Form.Item>
-          </Col>
-
-          {/* Upload */}
-          <Col span={24}>
-            <Form.Item label="Upload Documents">
-              <Upload {...uploadProps}>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
             </Form.Item>
           </Col>
         </Row>

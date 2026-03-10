@@ -19,10 +19,11 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   const [slotTimings, setSlotTimings] = useState();
   const [doctorList, setDoctorList] = useState([]);
   const [selectedDate, setSelectedDate] = useState();
+  const [doctorLoading, setDoctorLoading] = useState(false);
   const isLabReport = data?.appointment_category === "LabReport";
 
   const onCreate = (values) => {
-    console.log(values, "appointment time??????")
+    console.log(values, "appointment time??????");
 
     let appointmentTime;
     if (isLabReport) {
@@ -34,9 +35,9 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
 
     let payload = {
       ...values,
-      appointment_time: appointmentTime
-    }
-    setLoading(true)
+      appointment_time: appointmentTime,
+    };
+    setLoading(true);
     request({
       url: apiPath.appointment + "/" + data._id,
       method: "PUT",
@@ -59,26 +60,38 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   };
 
   const getDoctorList = () => {
+    setDoctorLoading(true);
+
     if (isLabReport) {
-      // For lab report, fetch all doctors without slot/time filter
       request({
         url: apiPath.doctors,
         method: "GET",
         onSuccess: (data) => {
           setDoctorList(data.extras);
+          setDoctorLoading(false);
         },
-        onError: (err) => {},
+        onError: () => {
+          setDoctorLoading(false);
+        },
       });
       return;
     }
-    if(!selectedDate || !slotTimings) return;
+
+    if (!selectedDate || !slotTimings) {
+      setDoctorLoading(false);
+      return;
+    }
+
     request({
       url: `${apiPath.doctors}?date=${selectedDate}&time=${slotTimings.split("-")[0]}`,
       method: "GET",
       onSuccess: (data) => {
         setDoctorList(data.extras);
+        setDoctorLoading(false);
       },
-      onError: (err) => {},
+      onError: () => {
+        setDoctorLoading(false);
+      },
     });
   };
 
@@ -89,32 +102,39 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
         const todayDate = moment().format("YYYY-MM-DD") + "T00:00:00.000Z";
         form.setFieldsValue({
           appointment_date: moment(new Date()),
-          appointment_time: data.appointment_time ? moment.utc(data.appointment_time, "HH:mm").local() : null,
+          appointment_time: data.appointment_time
+            ? moment.utc(data.appointment_time, "HH:mm").local()
+            : null,
           doctor_id: data.doctor_id,
         });
         setSelectedDate(todayDate);
       } else {
         const timeInLocal = moment.utc(data.appointment_time, "HH:mm").local();
 
-        let appointment_time = (timeInLocal).format("hh:mm A");
-        let timePart = data.appointment_time? data?.appointment_time?.split("T")[1]?.split(":"): [];
+        let appointment_time = timeInLocal.format("hh:mm A");
+        let timePart = data.appointment_time
+          ? data?.appointment_time?.split("T")[1]?.split(":")
+          : [];
         let hours = timePart?.[0];
         let minutes = timePart?.[1];
 
         // Combine hours and minutes in 24-hour format
         // const formattedTime = `${hours}:${minutes}`;
         const formattedTime = data.appointment_time;
-        if(data.appointment_time){
-
+        if (data.appointment_time) {
           setSlotTimings(formattedTime);
         }
         form.setFieldsValue({
-          appointment_date: data.appointment_date? moment(data.appointment_date): moment(new Date()), // Assuming data.appointment_date is in a suitable format
+          appointment_date: data.appointment_date
+            ? moment(data.appointment_date)
+            : moment(new Date()), // Assuming data.appointment_date is in a suitable format
           appointment_time: appointment_time, // Assuming data.appointment_time is already formatted
           doctor_id: data.doctor_id,
           // Set other form fields here based on the data object
         });
-        setSelectedDate(data.appointment_date?data.appointment_date: moment(new Date()));
+        setSelectedDate(
+          data.appointment_date ? data.appointment_date : moment(new Date()),
+        );
       }
     } else {
       setSelectedDate(moment(new Date()));
@@ -147,7 +167,7 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
     setSlotTimings(); // Reset slot timings when date changes
     console.log("Selected Date:", dateString);
     // form.setFieldsValue({
-    //   appointment_date: dateString, // Update the form field with the selected date 
+    //   appointment_date: dateString, // Update the form field with the selected date
     // });
     handleChange();
     // getDoctorList();
@@ -257,8 +277,8 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
               label="Select Date"
             >
               <DatePicker
-              // disabled
-              format="DD-MM-YYYY"
+                // disabled
+                format="DD-MM-YYYY"
                 onChange={handleDateChange}
                 disabledDate={disabledDate}
               />
@@ -290,12 +310,12 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
                 style={{ minWidth: "180px" }}
                 name="appointment_time"
               >
-                <Select onChange={handleTime} placeholder="Select Time" >
+                <Select onChange={handleTime} placeholder="Select Time">
                   {[...uniqueSlots].map((slotString) => {
                     const [startTime, endTime] = slotString.split("-");
                     return (
                       <Option key={slotString} value={startTime}>
-                        { moment
+                        {moment
                           .utc(startTime, "HH:mm")
                           .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
                           .format("hh:mm A")}
@@ -313,41 +333,25 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
               rules={[{ required: true, message: "Please select a doctor!" }]}
             >
               <Select
+                placeholder="Select Doctors"
+                showSearch
+                loading={doctorLoading}
+                notFoundContent={
+                  doctorLoading ? "Loading doctors..." : "No doctors found"
+                }
                 filterOption={(input, option) =>
-                  (option.label ?? "")
+                  (option?.children ?? "")
                     .toLowerCase()
                     .includes(input.toLowerCase())
                 }
-                placeholder="Select Doctors"
-                showSearch
-                onChange={handleChange}
               >
-                {console.log(doctorList, "doc>>>>>.")}
                 {doctorList?.map((item) => (
                   <Option key={item?._id} value={item?._id}>
-                    <div>
-                      {/* <span>Name: </span> */}
-                      <span>
-                        {item?.name
-                          ? item?.name
-                          : item?.firstName
-                          ? item?.firstName + item?.lastName
-                          : "-"}
-                      </span>
-                      {/* {item?.is_head_doctor && <span> (Head Doctor)</span>} */}
-                    </div>
-                    {/* <div>
-                      <span>Email: </span>
-                      <span>{item.email}</span>
-                    </div>
-                    <div>
-                      <span>Specialization: </span>
-                      {item?.specialist ? (
-                        <span>{item?.specialist}</span>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </div> */}
+                    {item?.name
+                      ? item?.name
+                      : item?.firstName
+                        ? item?.firstName + " " + item?.lastName
+                        : "-"}
                   </Option>
                 ))}
               </Select>

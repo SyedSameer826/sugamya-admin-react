@@ -708,27 +708,27 @@ function Index() {
             </Tooltip>
             {/* )} */}
 
-            {record?.appointment_status === "pending" &&
+            {/* {record?.appointment_status === "pending" &&
               record?.status === "NA" &&
               record?.appointment_category !== "Emergency" &&
-              !isPastAppointment && (
-                <Tooltip
-                  title={lang("Assign Doctor")}
-                  color={"purple"}
-                  key={"update" + routeName}
-                >
-                  <Button
-                    title={lang("Assign Doctor")}
-                    className="Edit-cls btnStyle primary_btn"
-                    onClick={() => {
-                      setSelected(record);
-                      setVisible(true);
-                    }}
-                  >
-                    Assign Doctor
-                  </Button>
-                </Tooltip>
-              )}
+              !isPastAppointment && ( */}
+            <Tooltip
+              title={lang("Assign Doctor")}
+              color={"purple"}
+              key={"update" + routeName}
+            >
+              <Button
+                title={lang("Assign Doctor")}
+                className="Edit-cls btnStyle primary_btn"
+                onClick={() => {
+                  setSelected(record);
+                  setVisible(true);
+                }}
+              >
+                Assign Doctor
+              </Button>
+            </Tooltip>
+            {/* )} */}
 
             <Tooltip
               color={"purple"}
