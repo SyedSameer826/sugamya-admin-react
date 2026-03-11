@@ -20,6 +20,7 @@ const AddReviewRatingForm = ({
   const [loading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
   const [appointments, setAppointments] = useState([]);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [nameInput, setNameInput] = useState(""); // <-- New state for Name input
 
@@ -27,12 +28,15 @@ const AddReviewRatingForm = ({
   useEffect(() => {
     if (!show) return;
 
+    setAppointmentLoading(true);
+
     request({
       url: api.appointment + `/list`,
       method: "GET",
       onSuccess: (res) => {
         if (res.status) {
           setAppointments(res.data || []);
+          setAppointmentLoading(false);
         }
       },
     });
@@ -232,6 +236,18 @@ const AddReviewRatingForm = ({
                     allowClear
                     placeholder="Select appointment (optional)"
                     onChange={handleAppointmentChange}
+                    showSearch
+                    loading={appointmentLoading}
+                    notFoundContent={
+                      appointmentLoading
+                        ? "Loading appointments..."
+                        : "No appointments found"
+                    }
+                    filterOption={(input, option) =>
+                      option.children
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
                     value={selectedAppointment?._id}
                   >
                     {appointments.map((appt) => (

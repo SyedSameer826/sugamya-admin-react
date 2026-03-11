@@ -267,6 +267,9 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
                 notFoundContent={
                   patientLoading ? "Loading patients..." : "No patients"
                 }
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().includes(input.toLowerCase())
+                }
                 onChange={(value) => {
                   const patient = patientList.find((p) => p._id === value);
                   setSelectedPatient(patient);
@@ -283,8 +286,9 @@ const AddAppointmentForm = ({ show, hide, refresh }) => {
               >
                 {patientList.map((patient) => (
                   <Option key={patient._id} value={patient._id}>
-                    {patient.name ||
-                      `${patient.firstName || ""} ${patient.lastName || ""}`}
+                    {patient.name
+                      ? `${patient.uhid || ""} - ${patient.name}`
+                      : `${patient.uhid || ""} - ${patient.firstName || ""} ${patient.lastName || ""}`}
                   </Option>
                 ))}
               </Select>
