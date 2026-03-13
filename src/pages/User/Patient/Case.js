@@ -20,8 +20,8 @@ function Case() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const contentToPrint = useRef(null);
   const navigate = useNavigate();
-  const location = useLocation()
-  const  stateData = location?.state?.data
+  const location = useLocation();
+  const stateData = location?.state?.data;
 
   const handlePrint = useReactToPrint({
     content: () => contentToPrint.current,
@@ -53,23 +53,22 @@ function Case() {
   }, []);
 
   const downloadPdf = (id) => {
-    setPdfLoading(true)
+    setPdfLoading(true);
     request({
       url: apiPath.downloadCase + "/" + params.id,
       method: "GET",
       onSuccess: (data) => {
         if (data && data.data) {
           const pdfUrl = data.data; // This is the direct bucket URL
-  
+
           // Fetch the file as a blob
           fetch(pdfUrl)
             .then((response) => {
               if (!response.ok) {
-                setPdfLoading(false)
+                setPdfLoading(false);
                 throw new Error("Network response was not ok");
-
               }
-              setPdfLoading(false)
+              setPdfLoading(false);
               return response.blob();
             })
             .then((blob) => {
@@ -77,30 +76,28 @@ function Case() {
               const url = window.URL.createObjectURL(blob);
               const link = document.createElement("a");
               link.href = url;
-  
+
               // Set a fixed file name
               link.download = `${moment().format("DD-MM-YYYY")}_case-paper_${stateData?.uhid}_${stateData?.name}`;
-  
+
               // Trigger download
               document.body.appendChild(link);
               link.click();
-  
+
               // Clean up
               document.body.removeChild(link);
               window.URL.revokeObjectURL(url);
-              setPdfLoading(false)
-
+              setPdfLoading(false);
             })
             .catch((error) => {
-              setPdfLoading(false)
+              setPdfLoading(false);
               console.error("Error downloading the file:", error);
               ShowToast("Failed to download the PDF.", Severty.ERROR);
             });
         } else {
-          setPdfLoading(false)
+          setPdfLoading(false);
           ShowToast("Invalid URL or data.", Severty.ERROR);
         }
-       
       },
       onError: (error) => {
         ShowToast(error, Severty.ERROR);
@@ -108,11 +105,10 @@ function Case() {
     });
   };
 
-
   const correctApptime = (appointment_time) => {
     const timeInLocal = moment.utc(appointment_time, "HH:mm").local();
-    return timeInLocal.isValid() ? timeInLocal.format("hh:mm A") : "-"
-  }
+    return timeInLocal.isValid() ? timeInLocal.format("hh:mm A") : "-";
+  };
 
   return (
     <>
@@ -126,13 +122,14 @@ function Case() {
               // onClick={() => handlePrint(null, () => contentToPrint.current)}
               loading={pdfLoading}
               disabled={pdfLoading}
-               onClick={()=>downloadPdf()}
+              onClick={() => downloadPdf()}
             >
               <i className="fas fa-print"></i>
             </Button>
           </>
         }
         ref={contentToPrint}
+        style={{ whiteSpace: "pre-wrap" }}
       >
         <Row gutter={[16, 16]}>
           <Col span={12} xs={24} md={24}>
@@ -181,7 +178,7 @@ function Case() {
                               <span> Appointment Date </span>{" "}
                               {list?.appointment_id
                                 ? moment(
-                                    list?.appointment_id?.appointment_date
+                                    list?.appointment_id?.appointment_date,
                                   ).format("DD-MM-YYYY")
                                 : "-"}
                             </p>
@@ -189,7 +186,9 @@ function Case() {
                               {" "}
                               <span> Appointment Time </span>{" "}
                               {list?.appointment_id
-                                ? correctApptime(list?.appointment_id?.appointment_time)
+                                ? correctApptime(
+                                    list?.appointment_id?.appointment_time,
+                                  )
                                 : "-"}
                             </p>
                           </Card>
@@ -253,13 +252,18 @@ function Case() {
                           <Card title="Dinacharya">
                             <p>
                               <span>Wake up at</span>{" "}
-                              {list?.dincharya?.length > 0 ? moment(list.dincharya[0].wakeup_at_AM).format("hh:mm A") 
-                              : "-"}
+                              {list?.dincharya?.length > 0
+                                ? moment(list.dincharya[0].wakeup_at_AM).format(
+                                    "hh:mm A",
+                                  )
+                                : "-"}
                             </p>
                             <p>
                               <span>Sleeps at</span>{" "}
                               {list?.dincharya?.length > 0
-                                ? moment(list.dincharya[0].sleeps_at_PM).format("hh:mm A") 
+                                ? moment(list.dincharya[0].sleeps_at_PM).format(
+                                    "hh:mm A",
+                                  )
                                 : "-"}
                             </p>
                             <p>
@@ -332,7 +336,9 @@ function Case() {
                                 <label>Time</label>
                                 <p>
                                   {list?.diet[0]?.tea?.length > 0
-                                    ? moment(list.diet[0].tea[0].time).format("hh:mm A")
+                                    ? moment(list.diet[0].tea[0].time).format(
+                                        "hh:mm A",
+                                      )
                                     : "-"}
                                 </p>
                               </div>
@@ -353,7 +359,9 @@ function Case() {
                                 <p>
                                   <p>
                                     {list?.diet[0].breakfast[0]
-                                      ? moment(list.diet[0].breakfast[0].time).format("hh:mm A")
+                                      ? moment(
+                                          list.diet[0].breakfast[0].time,
+                                        ).format("hh:mm A")
                                       : "-"}
                                   </p>
                                 </p>
@@ -377,7 +385,9 @@ function Case() {
                                 <p>
                                   <p>
                                     {list?.diet[0].lunch[0]
-                                      ? moment(list.diet[0].lunch[0].time).format("hh:mm A")
+                                      ? moment(
+                                          list.diet[0].lunch[0].time,
+                                        ).format("hh:mm A")
                                       : "-"}
                                   </p>
                                 </p>
@@ -401,7 +411,9 @@ function Case() {
                                 <p>
                                   <p>
                                     {list?.diet[0].snacks[0]
-                                      ? moment(list.diet[0].snacks[0].time).format("hh:mm A")
+                                      ? moment(
+                                          list.diet[0].snacks[0].time,
+                                        ).format("hh:mm A")
                                       : "-"}
                                   </p>
                                 </p>
@@ -425,7 +437,9 @@ function Case() {
                                 <p>
                                   <p>
                                     {list?.diet[0].dinner[0]
-                                      ? moment(list.diet[0].dinner[0].time).format("hh:mm A")
+                                      ? moment(
+                                          list.diet[0].dinner[0].time,
+                                        ).format("hh:mm A")
                                       : "-"}
                                   </p>
                                 </p>
@@ -448,7 +462,9 @@ function Case() {
                                 <p>
                                   <p>
                                     {list?.diet[0].any_other_food[0]
-                                      ? moment(list.diet[0].any_other_food[0].time).format("hh:mm A")
+                                      ? moment(
+                                          list.diet[0].any_other_food[0].time,
+                                        ).format("hh:mm A")
                                       : "-"}
                                   </p>
                                 </p>
@@ -507,7 +523,9 @@ function Case() {
                               {" "}
                               <span> Day Time Sleep</span>{" "}
                               {list?.other_details[0]
-                                ? moment(list.other_details[0].day_time_sleep).format("hh:mm A")
+                                ? moment(
+                                    list.other_details[0].day_time_sleep,
+                                  ).format("hh:mm A")
                                 : "-"}
                             </p>
                             <p>
@@ -524,7 +542,6 @@ function Case() {
                                 ? list.other_details[0].addictions
                                 : "-"}
                             </p>
-                          
                           </Card>
                         </Col>
 
@@ -592,9 +609,7 @@ function Case() {
                             <div className="maain-new-treatement-class-listhh">
                               <ul>
                                 {list
-                                  ? list.diagnosis.map((lst) => (
-                                      <li>{lst}</li>
-                                    ))
+                                  ? list.diagnosis.map((lst) => <li>{lst}</li>)
                                   : "-"}
                               </ul>
                             </div>
@@ -610,7 +625,17 @@ function Case() {
                                   ? list.treatment.map((lst) => <li>{lst}</li>)
                                   : "-"} */}
 
-                                    {list ? list?.treatment.length>0?  list.treatment.map((lst) => <li>{lst}</li>):list?.treatment[0]?.split("\n").map((lst, index) => <li key={index}>{lst}</li>) : "-"}
+                                {list
+                                  ? list?.treatment.length > 0
+                                    ? list.treatment.map((lst) => (
+                                        <li>{lst}</li>
+                                      ))
+                                    : list?.treatment[0]
+                                        ?.split("\n")
+                                        .map((lst, index) => (
+                                          <li key={index}>{lst}</li>
+                                        ))
+                                  : "-"}
                               </ul>
                             </div>
                           </Card>

@@ -23,6 +23,7 @@ const UpdateScheduledAppointmentForm = ({ show, hide, data, refresh }) => {
   const onCreate = (values) => {
     const payload = {
       slot_id: values?.appointment_time, // ✅ only slot _id
+      is_rescheduled: true,
     };
 
     setLoading(true);
