@@ -139,9 +139,9 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
       ...data,
       products: data.products,
       availability: updatedAvailability,
-      appointmentId : data?.appointmentDetails?.appointment_id
-      ? data?.appointmentDetails?.appointment_id : ""
-      
+      appointmentId: data?.appointmentDetails?.appointment_id
+        ? data?.appointmentDetails?.appointment_id
+        : "",
     });
     getCity({
       stateId: data.state,
@@ -175,17 +175,17 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   ];
 
   const OnAppointList = () => {
-    setLoading(true)
+    setLoading(true);
     request({
       url: apiPath.getAppointCart,
       method: "GET",
       onSuccess: (data) => {
         console.log(
           "check list apppppppppppppppppppppppppppppp",
-          data.data.data
+          data.data.data,
         );
         setAppointmentIds(data.data.data);
-        setLoading(false)
+        setLoading(false);
       },
       onError: (error) => {
         setLoading(false);
@@ -212,22 +212,24 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
   //   console.log('Received values:', values);
   // };
   const onCreate = (values) => {
-    setLoading(true)
+    setLoading(true);
     console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<", values);
-    if(!values?.products || !values?.products?.length){
-     return ShowToast("Please select atleast 1 product", Severty.ERROR);
+    if (!values?.products || !values?.products?.length) {
+      return ShowToast("Please select atleast 1 product", Severty.ERROR);
     }
 
-    const appId = data ? 
-       (data?.appointmentDetails?.appointment_id === values.appointmentId ? data?.appointmentDetails?._id : values.appointmentId)
-      : values.appointmentId
+    const appId = data
+      ? data?.appointmentDetails?.appointment_id === values.appointmentId
+        ? data?.appointmentDetails?._id
+        : values.appointmentId
+      : values.appointmentId;
     const payload = {
-      appointId:  appId,
+      appointId: appId,
       products: values.products,
       duration: values.duration,
       // cartExpiry: "15", // Assuming this value is constant
     };
- 
+
     // return console.log(payload,"payload")
     request({
       url: data ? `${apiPath.updateCartData}/${data._id}` : apiPath.addCart,
@@ -300,39 +302,36 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
           }Cart`}</h4>
         </div>
         <Row gutter={[16, 0]}>
-         
-            <Col span={24} lg={24} sm={24} className="mt-2">
-              <Form.Item
-                label="Appointment ID"
-                name="appointmentId"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select the appointment ID!",
-                  },
-                ]}
+          <Col span={24} lg={24} sm={24} className="mt-2">
+            <Form.Item
+              label="Appointment ID"
+              name="appointmentId"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select the appointment ID!",
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                style={{ width: "100%" }}
+                placeholder="Select Appointment ID"
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+                // disabled={data ? true : false}
               >
-                <Select
-                  showSearch
-                  style={{ width: "100%" }}
-                  placeholder="Select Appointment ID"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children
-                      .toLowerCase()
-                      .indexOf(input.toLowerCase()) >= 0
-                  }
-                  // disabled={data ? true : false}
-                >
-                  {appointmentIds.map((data, index) => (
-                    <Option key={index} value={data._id}>
-                      {data.appointment_id}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-         
+                {appointmentIds.map((data, index) => (
+                  <Option key={index} value={data._id}>
+                    {data.appointment_id}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
           <Form.List name="products">
             {(fields, { add, remove }) => (
@@ -444,7 +443,7 @@ const AddForm = ({ section, api, show, hide, data, refresh }) => {
                 },
               ]}
             >
-              <Input placeholder="Enter Duration" />
+              <InputNumber placeholder="Enter Duration" type="number" min={1} />
             </Form.Item>
           </Col>
 
