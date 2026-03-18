@@ -18,7 +18,7 @@ import moment from "moment";
 import notfound from "../../assets/images/no-image.png";
 import SingleImageUpload from "../../components/SingleImageUpload";
 const endpoint = "https://s3-noi.aces3.ai/sugamaya-bucket/";
-
+let { TextArea } = Input;
 function View() {
   const [formKey, setFormKey] = useState(0);
   const [form] = Form.useForm();
@@ -158,7 +158,9 @@ function View() {
                   <h5>Appointment Date:</h5>
                   <h6 className="cap">
                     {list?.appointment_date
-                      ? moment.utc(list?.appointment_date).format("DD-MM-YYYY hh:mm A")
+                      ? moment
+                          .utc(list?.appointment_date)
+                          .format("DD-MM-YYYY hh:mm A")
                       : "-"}
                   </h6>
                 </div>
@@ -202,7 +204,12 @@ function View() {
                     {list?.documentation ? list?.documentation : "-"}
                   </h6>
                 </div>
-                <div style={{ borderBottom: "1px solid #f1f1f1", paddingBottom: "2px" }}>
+                <div
+                  style={{
+                    borderBottom: "1px solid #f1f1f1",
+                    paddingBottom: "2px",
+                  }}
+                >
                   <h5 style={{ fontSize: "15px", fontWeight: "bold" }}>
                     Doctor ScreenShot
                   </h5>
@@ -210,10 +217,13 @@ function View() {
                     <Image
                       width={50}
                       height={50}
-                      src={shot.images.startsWith("http") ? shot.images : apiPath.assetURL + shot.images}
+                      src={
+                        shot.images.startsWith("http")
+                          ? shot.images
+                          : apiPath.assetURL + shot.images
+                      }
                     />
                   ))}
-
                 </div>
                 <div className="view-inner-cls">
                   <h5>Created On:</h5>
@@ -428,53 +438,53 @@ function View() {
 
                     {list?.otherDoc?.length > 0
                       ? list?.otherDoc?.map((doc) => (
-                        <h6>
-                          <a
-                            href="#"
-                            onClick={async (e) => {
-                              console.log(
-                                "patient>>>",
-                                list?.patient_details,
-                              );
-                              e.preventDefault();
-
-                              try {
-                                const response = await fetch(endpoint + doc);
-                                const blob = await response.blob();
-                                const url = window.URL.createObjectURL(blob);
-                                const formattedDate =
-                                  moment().format("DD-MM-YYYY"); // Get current date in YYYY_MM_DD format
-                                const fileName = `${formattedDate}_${list?.patient_details?.uhid}_${list?.patient_details?.name}_otherDocument.${doc.split('.').pop()}`;
-                                const a = document.createElement("a");
-                                a.style.display = "none";
-                                a.href = url;
-                                a.setAttribute("download", fileName); // Ensuring download attribute
-                                document.body.appendChild(a);
-                                a.click(); // Programmatically triggering download
-                                document.body.removeChild(a);
-
-                                //  window.URL.revokeObjectURL(url);
-                              } catch (error) {
-                                console.error(
-                                  "Error downloading file:",
-                                  error,
+                          <h6>
+                            <a
+                              href="#"
+                              onClick={async (e) => {
+                                console.log(
+                                  "patient>>>",
+                                  list?.patient_details,
                                 );
-                              }
-                            }}
-                          >
-                            {/* <a
+                                e.preventDefault();
+
+                                try {
+                                  const response = await fetch(endpoint + doc);
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const formattedDate =
+                                    moment().format("DD-MM-YYYY"); // Get current date in YYYY_MM_DD format
+                                  const fileName = `${formattedDate}_${list?.patient_details?.uhid}_${list?.patient_details?.name}_otherDocument.${doc.split(".").pop()}`;
+                                  const a = document.createElement("a");
+                                  a.style.display = "none";
+                                  a.href = url;
+                                  a.setAttribute("download", fileName); // Ensuring download attribute
+                                  document.body.appendChild(a);
+                                  a.click(); // Programmatically triggering download
+                                  document.body.removeChild(a);
+
+                                  //  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error(
+                                    "Error downloading file:",
+                                    error,
+                                  );
+                                }
+                              }}
+                            >
+                              {/* <a
                               href={endpoint + doc}
                               target="_blank"
                               rel="noopener noreferrer"
                             > */}
-                            <div className="pdf-icons">
-                              {" "}
-                              <i className="far fa-file-alt"></i>{" "}
-                            </div>
-                            View Patient documents:
-                          </a>
-                        </h6>
-                      ))
+                              <div className="pdf-icons">
+                                {" "}
+                                <i className="far fa-file-alt"></i>{" "}
+                              </div>
+                              View Patient documents:
+                            </a>
+                          </h6>
+                        ))
                       : "-"}
                     <div></div>
                   </div>
@@ -577,31 +587,31 @@ function View() {
                           <Row gutter={[48, 12]} className="pt-3 m-0">
                             <Col span={24} md={12}>
                               <Form.Item label="C/o" name="c_o">
-                                <Input placeholder="C/o" />
+                                <TextArea placeholder="C/o" />
                               </Form.Item>
                             </Col>
 
                             <Col span={24} md={12}>
                               <Form.Item label="Nadi" name="nadi">
-                                <Input placeholder="Nadi" />
+                                <TextArea placeholder="Nadi" />
                               </Form.Item>
                             </Col>
 
                             <Col span={24} md={12}>
                               <Form.Item label="Mala" name="mala">
-                                <Input placeholder="Mala" />
+                                <TextArea placeholder="Mala" />
                               </Form.Item>
                             </Col>
 
                             <Col span={24} md={12}>
                               <Form.Item label="Mutra" name="mutra">
-                                <Input placeholder="Mutra" />
+                                <TextArea placeholder="Mutra" />
                               </Form.Item>
                             </Col>
 
                             <Col span={24} md={12}>
                               <Form.Item label="Nidra" name="nidra">
-                                <Input placeholder="Nidra" />
+                                <TextArea placeholder="Nidra" />
                               </Form.Item>
                             </Col>
 
@@ -610,7 +620,7 @@ function View() {
                                 label="Menstrual History"
                                 name="menstrual_history"
                               >
-                                <Input placeholder="Menstrual History" />
+                                <TextArea placeholder="Menstrual History" />
                               </Form.Item>
                             </Col>
 
@@ -619,7 +629,7 @@ function View() {
                                 label="Other Findings"
                                 name="other_findings"
                               >
-                                <Input placeholder="Other Findings" />
+                                <TextArea placeholder="Other Findings" />
                               </Form.Item>
                             </Col>
 
@@ -628,13 +638,13 @@ function View() {
                                 label="Investigation"
                                 name="investigation"
                               >
-                                <Input placeholder="Investigation" />
+                                <TextArea placeholder="Investigation" />
                               </Form.Item>
                             </Col>
 
                             <Col span={24} md={12}>
                               <Form.Item label="Treatment" name="treatment">
-                                <Input placeholder="Treatment" />
+                                <TextArea placeholder="Treatment" />
                               </Form.Item>
                             </Col>
                           </Row>
