@@ -94,12 +94,15 @@ function DoctorAppointments() {
     {
       title: "Slot time from",
       render: (record) =>
-        moment(record.slot_time_from, "HH:mm").format("hh:mm A"),
+        moment
+          .utc(record.slot_time_from, "HH:mm") // treat as UTC
+          .local() // convert to local timezone
+          .format("hh:mm A"),
     },
     {
       title: "Slot time to",
       render: (record) =>
-        moment(record.slot_time_to, "HH:mm").format("hh:mm A"),
+        moment.utc(record.slot_time_to, "HH:mm").local().format("hh:mm A"),
     },
     {
       title: "Slot day",
