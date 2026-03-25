@@ -973,8 +973,8 @@ function Index() {
             </>
           </TabPane>
 
-          {/* TAB 2 → DOCTOR APPOINTMENTS */}
-          <TabPane tab="Doctor Appointments" key="2">
+          {/* TAB 2 → DOCTOR AVAILABILITY */}
+          <TabPane tab="Doctor Availability" key="2">
             <DoctorAppointments />
           </TabPane>
         </Tabs>
